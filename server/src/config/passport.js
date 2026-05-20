@@ -3,8 +3,8 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { pool } from "../db/connection.js";
 
+console.log(process.env.GOOGLE_CALLBACK_URL);
 passport.use(
-  console.log(process.env.GOOGLE_CALLBACK_URL);
   new GoogleStrategy(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
