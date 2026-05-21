@@ -5,7 +5,7 @@ export const getUserModel = async (id) => {
   try {
 
     const [rows] = await pool.query(
-      "SELECT id, nombre, apellido, email, telefono FROM usuario WHERE id = ?",
+      "SELECT id, nombre, apellido, nro_documento, email, telefono FROM usuario WHERE id = ?",
       [id]
     );
 

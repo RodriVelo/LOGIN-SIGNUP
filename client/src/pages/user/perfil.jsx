@@ -1,5 +1,6 @@
 import { User, FileText, Mail, Phone, BadgeCheck } from "lucide-react";
 import { useEffect, useState } from "react";
+import PerfilEdit from "../../componentes/perfil/perfilEdit";
 
 import axios from "axios";
 
@@ -15,6 +16,10 @@ export default function Perfil() {
     telefono: "",
   });
 
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
   useEffect(() => {
     const getUser = async () => {
       try {
@@ -23,6 +28,7 @@ export default function Perfil() {
         });
 
         if (response.data.success) {
+          console.log(response.data.user);
           setUser(response.data.user);
         }
       } catch (err) {
@@ -33,7 +39,7 @@ export default function Perfil() {
     getUser();
   }, []);
 
-  const initials = `${user.nombre[0]}${user.apellido[0]}`;
+  const initials = `${user.nombre?.[0] || ""}${user.apellido?.[0] || ""}`;
 
   const fields = [
     {
@@ -62,6 +68,38 @@ export default function Perfil() {
       icon: Phone,
     },
   ];
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+  };
+
+  async function handleSaveProfile(updatedData) {
+    try {
+      const response = await axios.put(`${API}/user/updateUser`, updatedData, {
+        withCredentials: true,
+      });
+
+      if (response.data.success) {
+        setUser(response.data.user);
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  if (isEditing) {
+    return (
+      <section>
+        <PerfilEdit
+          userData={user}
+          onSave={handleSaveProfile}
+          onCancel={() => setIsEditing(false)}
+          loading={loading}
+        />
+      </section>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[oklch(14.8%_0.004_228.8)] flex items-center justify-center p-6 font-mono">
@@ -132,6 +170,12 @@ export default function Perfil() {
         <p className="text-center text-slate-700 text-xs mt-4 tracking-widest uppercase">
           ID · {user.nro_documento}
         </p>
+        <button
+          onClick={() => setIsEditing(true)}
+          className="w-full bg-red-500 hover:bg-red-900 text-white font-semibold py-2 rounded-lg transition-all active:scale-95"
+        >
+          Editar
+        </button>
       </div>
     </div>
   );
