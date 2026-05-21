@@ -45,12 +45,13 @@ export const userLoginModel = async (email, contrasena) => {
   try {
     const [rows] = await pool.query(
       `
-            SELECT 
+           SELECT 
               usuario.id,
               usuario.nombre,
               usuario.apellido,
               usuario.email,
               usuario.contrasena,
+              usuario.google_id,
               rol.tipo AS rol
             FROM usuario
             JOIN rol ON usuario.id_rol = rol.id
@@ -65,8 +66,15 @@ export const userLoginModel = async (email, contrasena) => {
         message: "Usuario no encontrado.",
       };
     }
-
+    
     const user = rows[0];
+
+    if (!user.contrasena && user.google_id) {
+    return {
+      success: false,
+      message: "Esta cuenta fue creada con Google",
+    };
+  }
 
     const isValidPassword = await comparePassword(contrasena, user.contrasena);
 

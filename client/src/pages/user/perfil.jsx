@@ -3,79 +3,69 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 
-
 const API = import.meta.env.VITE_API_URL;
 
-
-
-
 export default function Perfil() {
+  const [user, setUser] = useState({
+    id: "",
+    nombre: "",
+    apellido: "",
+    nro_documento: "",
+    email: "",
+    telefono: "",
+  });
 
-    const [user, setUser] = useState({
-  id: "",
-  nombre: "",
-  apellido: "",
-  nro_documento: "",
-  email: "",
-  telefono: "",
-});
-
-
-useEffect(() => {
-  const getUser = async () => {
-    try {
-      const response = await axios.get(
-        `${API}/user/getUser`,
-        {
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const response = await axios.get(`${API}/user/getUser`, {
           withCredentials: true,
+        });
+
+        if (response.data.success) {
+          setUser(response.data.user);
         }
-      );
-
-      if (response.data.success) {
-        setUser(response.data.user);
+      } catch (err) {
+        console.error(err);
       }
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    };
 
-  getUser();
-}, []);
+    getUser();
+  }, []);
 
   const initials = `${user.nombre[0]}${user.apellido[0]}`;
 
   const fields = [
-  {
-    label: "Nombre",
-    value: user.nombre,
-    icon: User,
-  },
-  {
-    label: "Apellido",
-    value: user.apellido,
-    icon: User,
-  },
-  {
-    label: "Nro. Documento",
-    value: user.nro_documento,
-    icon: FileText,
-  },
-  {
-    label: "Email",
-    value: user.email,
-    icon: Mail,
-  },
-  {
-    label: "Teléfono",
-    value: user.telefono,
-    icon: Phone,
-  },
-];
+    {
+      label: "Nombre",
+      value: user.nombre,
+      icon: User,
+    },
+    {
+      label: "Apellido",
+      value: user.apellido,
+      icon: User,
+    },
+    {
+      label: "Nro. Documento",
+      value: user.nro_documento,
+      icon: FileText,
+    },
+    {
+      label: "Email",
+      value: user.email,
+      icon: Mail,
+    },
+    {
+      label: "Teléfono",
+      value: user.telefono,
+      icon: Phone,
+    },
+  ];
 
   return (
     <div className="min-h-screen bg-[oklch(14.8%_0.004_228.8)] flex items-center justify-center p-6 font-mono">
       <div className="w-full max-w-md">
-
         {/* Header card */}
         <div className="relative bg-[oklch(21%_0.006_285.885)] border border-slate-700 rounded-2xl p-8 mb-4 overflow-hidden">
           {/* Decorative corner accent */}
@@ -89,7 +79,11 @@ useEffect(() => {
                 {initials}
               </div>
               <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-red-400 rounded-full border-2 border-slate-900 flex items-center justify-center">
-                <BadgeCheck size={11} className="text-slate-900" strokeWidth={3} />
+                <BadgeCheck
+                  size={11}
+                  className="text-slate-900"
+                  strokeWidth={3}
+                />
               </div>
             </div>
 
@@ -117,7 +111,10 @@ useEffect(() => {
               className="flex items-center gap-4 px-6 py-4 group hover:bg-red-900/50 transition-colors duration-150"
             >
               <div className="shrink-0 w-8 h-8 rounded-lg bg-slate-800 group-hover:bg-emerald-500/15 border border-slate-700 group-hover:border-emerald-500/30 flex items-center justify-center transition-all duration-150">
-                <Icon size={15} className="text-slate-500 group-hover:text-red-400 transition-colors duration-150" />
+                <Icon
+                  size={15}
+                  className="text-slate-500 group-hover:text-red-400 transition-colors duration-150"
+                />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-slate-500 text-xs tracking-widest uppercase mb-0.5">

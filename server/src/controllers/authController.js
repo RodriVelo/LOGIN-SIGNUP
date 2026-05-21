@@ -2,12 +2,18 @@ import { userRegisterModel, userLoginModel } from "../models/authModels.js";
 import { generateToken } from "../utils/jwtUtils.js";
 import jwt from "jsonwebtoken";
 
-
 export const userRegister = async (req, res) => {
-  
-  const { nombre,apellido,email, nro_documento, telefono, contrasena } = req.body;
+  const { nombre, apellido, email, nro_documento, telefono, contrasena } =
+    req.body;
 
-  if (!nombre || !apellido || !email || !nro_documento || !telefono || !contrasena) {
+  if (
+    !nombre ||
+    !apellido ||
+    !email ||
+    !nro_documento ||
+    !telefono ||
+    !contrasena
+  ) {
     return res
       .status(400)
       .json({ success: false, message: "Debe rellenar todos los campos." });
@@ -46,23 +52,29 @@ export const userLogin = async (req, res) => {
 
     const result = await userLoginModel(email, contrasena);
 
+    // 👇 ACÁ va la validación
     if (!result.success) {
+
+      if (result.message.includes("Google")) {
+        return res.status(403).json(result);
+      }
+
       return res.status(401).json(result);
     }
-   
-      const token = generateToken({
+
+    // recién si todo está OK seguís acá
+    const token = generateToken({
       id: result.user.id,
       nombre: result.user.nombre,
       apellido: result.user.apellido,
       email: result.user.email,
       rol: result.user.rol,
     });
+
     res.cookie("token", token, {
       httpOnly: true,
-
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -72,6 +84,7 @@ export const userLogin = async (req, res) => {
       success: true,
       user: userWithoutPassword,
     });
+
   } catch (error) {
     return res.status(500).json({
       success: false,
@@ -93,20 +106,17 @@ export const googleCallback = async (req, res) => {
       process.env.JWT_SECRET,
       {
         expiresIn: "7d",
-      }
+      },
     );
 
-        res.cookie("token", token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: process.env.NODE_ENV === "production"
-          ? "none"
-          : "lax",
-        maxAge: 24 * 60 * 60 * 1000,
-      });
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
 
     res.redirect(process.env.CLIENT_URL);
-
   } catch (error) {
     console.log(error);
 

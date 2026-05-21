@@ -12,6 +12,8 @@ import Login from "./pages/auth/login";
 import ProtectedRoute from "./utils/protectedRoute";
 
 import Perfil from "./pages/user/perfil";
+import PanelAdmin from "./pages/admin/panelAdmin";
+import Users from "./pages/admin/users";
 
 import { AuthProvider } from "./utils/authContext";
 
@@ -33,6 +35,22 @@ function App() {
             element={
               <ProtectedRoute>
                 <Perfil />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <PanelAdmin />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute>
+                <Users />
               </ProtectedRoute>
             }
           />

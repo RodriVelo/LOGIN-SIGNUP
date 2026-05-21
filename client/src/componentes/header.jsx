@@ -67,7 +67,7 @@ export default function Header() {
               <Shield size={14} />
               Admin
             </NavButton>
-            <NavButton onClick={() => navigate("/usuarios")}>
+            <NavButton onClick={() => navigate("/users")}>
               <Users size={14} />
               Usuarios
             </NavButton>
