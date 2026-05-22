@@ -28,7 +28,6 @@ export default function Perfil() {
         });
 
         if (response.data.success) {
-          
           setUser(response.data.user);
         }
       } catch (err) {
@@ -75,16 +74,13 @@ export default function Perfil() {
 
   async function handleSaveProfile(updatedData) {
     try {
-      const response = await axios.put(`${API}/user/updateUser`, updatedData,
-      {
+      const response = await axios.put(`${API}/user/updateUser`, updatedData, {
         withCredentials: true,
       });
 
       if (response.data.success) {
-        console.log(response.data.user)
         setUser(response.data.user);
         setIsEditing(false);
-        
       }
     } catch (error) {
       console.error(error);
@@ -128,7 +124,6 @@ export default function Perfil() {
               </div>
             </div>
 
-            {/* Name & status */}
             <div>
               <h1 className="text-white text-xl font-semibold tracking-tight leading-tight">
                 {user.nombre} {user.apellido}
@@ -144,7 +139,6 @@ export default function Perfil() {
           </div>
         </div>
 
-        {/* Info fields */}
         <div className="bg-[oklch(21%_0.006_285.885)] border border-slate-700 rounded-2xl overflow-hidden divide-y divide-slate-800">
           {fields.map(({ label, value, icon: Icon }) => (
             <div
@@ -170,14 +164,14 @@ export default function Perfil() {
         </div>
 
         {/* Footer */}
-        <p className="text-center text-slate-700 text-xs mt-4 tracking-widest uppercase">
+        <p className="text-center text-slate-700 text-xs my-4 tracking-widest uppercase">
           ID · {user.nro_documento}
         </p>
         <button
           onClick={() => setIsEditing(true)}
           className="w-full bg-red-500 hover:bg-red-900 text-white font-semibold py-2 rounded-lg transition-all active:scale-95"
         >
-          Editar
+          Editar perfil
         </button>
       </div>
     </div>

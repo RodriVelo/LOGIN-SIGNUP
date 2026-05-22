@@ -16,16 +16,18 @@ export const getUserModel = async (id) => {
   }
 };
 export const updateUserModel = async (userId, userData) => {
-  const { nombre, apellido, email, telefono } = userData;
+  console.log(userData)
+  const { nombre, apellido, email,nro_documento, telefono } = userData;
 
   const [result] = await pool.query(
     `UPDATE usuario
      SET nombre = ?,
          apellido = ?,
          email = ?,
+         nro_documento= ?,
          telefono = ?
      WHERE id = ?`,
-    [nombre, apellido, email, telefono, userId]
+    [nombre, apellido, email, nro_documento, telefono, userId]
   );
 
   return result;
