@@ -167,43 +167,33 @@ export default function PerfilEdit({ userData, onSave, onCancel, loading }) {
   </div>
 
   {/* Email */}
-  <div className="flex flex-col">
-    <label className="mb-2 font-medium text-gray-200">
-      Email *
-    </label>
-
-    <input
-      type="email"
-      name="email"
-      value={formData.email}
-      onChange={handleInputChange}
-      placeholder="correo@ejemplo.com"
-      className={`
-        w-full
-        rounded-xl
-        border
-        bg-white/10
-        px-4 py-3
-        text-white
-        placeholder:text-gray-400
-        outline-none
-        transition
-        focus:ring-2
-        focus:ring-red-500/30
-        ${
-          errors.email
-            ? "border-red-500"
-            : "border-white/10 focus:border-red-400"
-        }
-      `}
-    />
-
-    {errors.email && (
-      <span className="text-red-400 text-sm mt-1">
-        {errors.email}
-      </span>
-    )}
-  </div>
+ <input
+  type="email"
+  name="email"
+  value={formData.email}
+  disabled
+  placeholder="correo@ejemplo.com"
+  className={`
+    w-full
+    rounded-xl
+    border
+    bg-white/10
+    px-4 py-3
+    text-white
+    placeholder:text-gray-400
+    outline-none
+    transition
+    focus:ring-2
+    focus:ring-red-500/30
+    disabled:opacity-60
+    disabled:cursor-not-allowed
+    ${
+      errors.email
+        ? "border-red-500"
+        : "border-white/10 focus:border-red-400"
+    }
+  `}
+/>
 
   {/* DNI */}
   <div className="flex flex-col">
