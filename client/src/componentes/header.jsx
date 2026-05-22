@@ -155,11 +155,11 @@ export default function Header() {
               Home
             </DropdownItem>
 
-            {user?.rol === "cliente" && (
+          
               <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
                 Perfil
               </DropdownItem>
-            )}
+  
 
             {user?.rol === "admin" && (
               <>
