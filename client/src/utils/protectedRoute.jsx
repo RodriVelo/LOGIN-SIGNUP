@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { LoaderCircle } from "lucide-react";
 
 const ProtectedRoute = ({ children, rolPermitido }) => {
   const [loading, setLoading] = useState(true);
@@ -68,14 +69,24 @@ const ProtectedRoute = ({ children, rolPermitido }) => {
     checkAuth();
   }, [location.pathname]);
 
-  // Loading
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <h1>Verificando sesión...</h1>
+// Loading
+if (loading) {
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-slate-100">
+      <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl shadow-lg">
+        <LoaderCircle className="w-14 h-14 text-red-600 animate-spin" />
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-slate-800">
+            Verificando sesión
+          </h2>
+          <p className="text-sm text-slate-500">
+            Espera un momento...
+          </p>
+        </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
   // No autenticado
   if (!isAuthenticated) {
