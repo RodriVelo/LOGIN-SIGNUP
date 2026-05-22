@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 
 import { pool } from "../db/connection.js";
 
-console.log(process.env.GOOGLE_CALLBACK_URL);
+
 passport.use(
   new GoogleStrategy(
     {

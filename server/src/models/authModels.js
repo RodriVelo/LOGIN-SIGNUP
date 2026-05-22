@@ -3,7 +3,7 @@ import { comparePassword } from "../utils/passwordUtils.js";
 
 // Register User
 export const userRegisterModel = async (user) => {
-  console.log(user);
+
   try {
     // 1) Chequear usuario existente
     const [existingUser] = await pool.query(

@@ -28,7 +28,7 @@ export default function Perfil() {
         });
 
         if (response.data.success) {
-          console.log(response.data.user);
+          
           setUser(response.data.user);
         }
       } catch (err) {
@@ -75,13 +75,16 @@ export default function Perfil() {
 
   async function handleSaveProfile(updatedData) {
     try {
-      const response = await axios.put(`${API}/user/updateUser`, updatedData, {
+      const response = await axios.put(`${API}/user/updateUser`, updatedData,
+      {
         withCredentials: true,
       });
 
       if (response.data.success) {
+        console.log(response.data.user)
         setUser(response.data.user);
         setIsEditing(false);
+        
       }
     } catch (error) {
       console.error(error);

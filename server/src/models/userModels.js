@@ -15,3 +15,18 @@ export const getUserModel = async (id) => {
     throw error;
   }
 };
+export const updateUserModel = async (userId, userData) => {
+  const { nombre, apellido, email, telefono } = userData;
+
+  const [result] = await pool.query(
+    `UPDATE usuario
+     SET nombre = ?,
+         apellido = ?,
+         email = ?,
+         telefono = ?
+     WHERE id = ?`,
+    [nombre, apellido, email, telefono, userId]
+  );
+
+  return result;
+};
