@@ -17,7 +17,11 @@ router.post("/user-register", hashPassword, userRegister);
 router.post("/login", userLogin);
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
 
   res.json({
     message: "Sesión cerrada",
