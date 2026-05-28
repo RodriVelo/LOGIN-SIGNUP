@@ -14,7 +14,7 @@ import ProtectedRoute from "./utils/protectedRoute";
 import Perfil from "./pages/user/perfil";
 import PanelAdmin from "./pages/admin/panelAdmin";
 import Users from "./pages/admin/users";
-
+import Canchas from "./pages/canchas/canchas";
 import { AuthProvider } from "./utils/authContext";
 
 function App() {
@@ -52,6 +52,14 @@ function App() {
               <ProtectedRoute>
                 <Users />
               </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/canchas"
+            element={
+             
+                <Canchas />
+              
             }
           />
         </Routes>

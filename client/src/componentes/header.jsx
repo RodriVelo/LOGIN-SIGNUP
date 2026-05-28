@@ -70,6 +70,9 @@ export default function Header() {
         <NavButton onClick={() => go("/")}>
           <Home size={14} /> Home
         </NavButton>
+        <NavButton onClick={() => go("/canchas")}>
+          <Home size={14} /> Canchas
+        </NavButton>
         {user?.rol === "cliente" && (
           <NavButton onClick={() => go("/perfil")}>
             <User size={14} /> Perfil
@@ -159,6 +162,11 @@ export default function Header() {
               <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
                 Perfil
               </DropdownItem>
+
+              <DropdownItem icon={<User size={16} />} onClick={() => go("/canchas")}>
+                Canchas
+              </DropdownItem>
+  
   
 
             {user?.rol === "admin" && (

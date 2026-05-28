@@ -5,12 +5,14 @@ import createAllTables from "./db/dbUtils.js";
 import authRoutes from "./routes/authRoutes.js"
 import cookieParser from "cookie-parser";
 import passport from "./config/passport.js";
-import authUser from "./routes/userRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
+import canchasRoutes from "./routes/canchasRoutes.js"
+import turnosRoutes from "./routes/turnosRoutes.js"
+import reservaRoutes from "./routes/resevaRoute.js"
 
 
 const app = express();
 app.use(passport.initialize());
-
 app.use(cors({
   origin: process.env.CLIENT_URL,
   credentials: true,
@@ -20,7 +22,11 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(`/auth`, authRoutes);
-app.use(`/user`, authUser);
+app.use(`/user`, userRoutes);
+app.use(`/canchas`, canchasRoutes)
+app.use(`/turnos`, turnosRoutes)
+app.use(`/reservas`, reservaRoutes)
+
 
 
 
