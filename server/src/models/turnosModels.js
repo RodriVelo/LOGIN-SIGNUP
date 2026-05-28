@@ -4,9 +4,21 @@ export const getTurnosModel = async (fecha) => {
   try {
 
     const [rows] = await pool.query(
-      `SELECT id, cancha_id, fecha, horario_inicio, horario_fin, estado
-       FROM turno
-       WHERE fecha = ?`,
+      `SELECT 
+          t.id,
+          t.cancha_id,
+          t.fecha,
+          t.horario_inicio,
+          t.horario_fin,
+          t.estado,
+          r.id AS reserva_id,
+          u.nombre AS nombre_usuario,
+          u.telefono AS telefono_usuario,
+          u.email AS email_usuario
+        FROM turno t
+        LEFT JOIN reserva r ON r.turno_id = t.id
+        LEFT JOIN usuario u ON u.id = r.usuario_id
+        WHERE t.fecha = ?`,
       [fecha]
     );
 
