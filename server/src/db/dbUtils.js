@@ -186,73 +186,36 @@ const eliminarTurnosViejos = async () => {
 
 const generarTurnos = async () => {
   try {
-
-    // obtener canchas activas
-    const [canchas] = await pool.query(`
-      SELECT id
-      FROM cancha
-      WHERE activa = true
-    `);
+    const [canchas] = await pool.query(`SELECT id FROM cancha WHERE activa = true`);
 
     if (canchas.length === 0) {
       console.log("⚠️ No hay canchas creadas");
       return;
     }
 
-    const hoy = new Date();
-
-    // próximos 14 días
     for (let dia = 0; dia < 14; dia++) {
 
-      const fecha = new Date(hoy);
+      // ✅ Crear fecha fresca cada iteración, sin mutar nada
+      const fecha = new Date();
+      fecha.setUTCHours(0, 0, 0, 0);
+      fecha.setUTCDate(fecha.getUTCDate() + dia);
 
-      fecha.setDate(hoy.getDate() + dia);
+      // ✅ Formatear siempre desde UTC para evitar desfase de zona horaria
+      const fechaFormateada = fecha.toISOString().split("T")[0];
 
-      const fechaFormateada = fecha
-        .toISOString()
-        .split("T")[0];
-
-      // recorrer canchas
       for (const cancha of canchas) {
-
-        // horarios de 10 a 23
         for (let hora = 10; hora < 23; hora++) {
-
-          const horario_inicio = `${hora
-            .toString()
-            .padStart(2, "0")}:00:00`;
-
-          const horario_fin = `${(hora + 1)
-            .toString()
-            .padStart(2, "0")}:00:00`;
+          const horario_inicio = `${String(hora).padStart(2, "0")}:00:00`;
+          const horario_fin = `${String(hora + 1).padStart(2, "0")}:00:00`;
 
           try {
-
             await pool.query(
-              `
-              INSERT INTO turno (
-                cancha_id,
-                fecha,
-                horario_inicio,
-                horario_fin
-              )
-              VALUES (?, ?, ?, ?)
-              `,
-              [
-                cancha.id,
-                fechaFormateada,
-                horario_inicio,
-                horario_fin,
-              ]
+              `INSERT INTO turno (cancha_id, fecha, horario_inicio, horario_fin)
+               VALUES (?, ?, ?, ?)`,
+              [cancha.id, fechaFormateada, horario_inicio, horario_fin]
             );
-
           } catch (error) {
-
-            // evita error por duplicados
-            if (error.code !== "ER_DUP_ENTRY") {
-              throw error;
-            }
-
+            if (error.code !== "ER_DUP_ENTRY") throw error;
           }
         }
       }
@@ -261,10 +224,8 @@ const generarTurnos = async () => {
     console.log("✅ Turnos generados correctamente");
 
   } catch (error) {
-
     console.log("❌ Error generando turnos");
     console.log(error.message);
-
   }
 };
 
