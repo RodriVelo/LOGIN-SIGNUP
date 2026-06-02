@@ -9,6 +9,7 @@ import userRoutes from "./routes/userRoutes.js";
 import canchasRoutes from "./routes/canchasRoutes.js"
 import turnosRoutes from "./routes/turnosRoutes.js"
 import reservaRoutes from "./routes/resevaRoute.js"
+import panelAdminRoutes from "./routes/panelAdminRoutes.js"
 
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(`/user`, userRoutes);
 app.use(`/canchas`, canchasRoutes)
 app.use(`/turnos`, turnosRoutes)
 app.use(`/reservas`, reservaRoutes)
+app.use(`/panelAdmin`, panelAdminRoutes)
 
 
 

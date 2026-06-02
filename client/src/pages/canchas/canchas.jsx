@@ -21,24 +21,28 @@ export default function Canchas() {
 
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const getCanchas = async () => {
-      try {
-        const response = await axios.get(`${API}/canchas/getCanchas`);
-        if (response.data.success) {
-          const activas = response.data.canchas.filter((c) => c.activa === 1);
-          setCanchas(activas);
-          if (activas.length > 0) setCanchaAbierta(activas[0].id);
+    useEffect(() => {
+      const getCanchas = async () => {
+        try {
+          const response = await axios.get(`${API}/canchas/getCanchas`);
+          if (response.data.success) {
+            const todasLasCanchas = response.data.canchas;
+            const activas = todasLasCanchas.filter((c) => c.activa === 1);
+            const canchasAMostrar = user?.rol === "admin" ? todasLasCanchas : activas;
+
+            setCanchas(canchasAMostrar);
+            if (canchasAMostrar.length > 0) setCanchaAbierta(canchasAMostrar[0].id);
+          }
+        } catch (err) {
+          console.error(err);
+          setError("No se pudieron cargar las canchas.");
+        } finally {
+          setLoading(false);
         }
-      } catch (err) {
-        console.error(err);
-        setError("No se pudieron cargar las canchas.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    getCanchas();
-  }, []);
+      };
+
+      if (user !== null) getCanchas(); // ← espera a que user esté disponible
+    }, [user]); // ← agrega user como dependencia
 
   useEffect(() => {
     const getTurnos = async () => {
@@ -63,6 +67,7 @@ export default function Canchas() {
     return (
       <CanchasAdmin
         canchas={canchas}
+        setCanchas={setCanchas}
         turnos={turnos}
         setTurnos={setTurnos}
         loading={loading}

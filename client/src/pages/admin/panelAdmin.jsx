@@ -1,129 +1,113 @@
-import {
-  Users,
-  ShieldCheck,
-  BarChart3,
-  Settings,
-  UserPlus,
-  Activity,
-  BadgeCheck,
-  Bell,
-} from "lucide-react";
+import { Users, Calendar, Clock, CircleDollarSign } from "lucide-react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import NavegadorModalUsuario from "../../componentes/panelAdmin/navegadorModalUsuario";
+import NavegadorModalHistorial from "../../componentes/panelAdmin/navegadorModalHistorial";
+import NavegadorModalIngresos from "../../componentes/panelAdmin/navegadorModalIngresos";
+import NavegadorModalReservas from "../../componentes/panelAdmin/navegadorModalReservas";
 
+const API = import.meta.env.VITE_API_URL;
+axios.defaults.withCredentials = true;
 
-export default function PanelAdmin(){
-
-const modules = [
-  {
-    title: "Usuarios",
-    description:
-      "Administrá usuarios, permisos y estados dentro de la plataforma.",
-    icon: Users,
-  },
-  {
-    title: "Seguridad",
-    description:
-      "Controlá accesos, autenticaciones y configuraciones de seguridad.",
-    icon: ShieldCheck,
-  },
-  {
-    title: "Estadísticas",
-    description:
-      "Visualizá métricas, actividad y rendimiento general del sistema.",
-    icon: BarChart3,
-  },
-  {
-    title: "Configuración",
-    description:
-      "Personalizá opciones generales y parámetros administrativos.",
-    icon: Settings,
-  },
+const TABS = [
+  { key: "usuarios", label: "Usuarios" },
+  { key: "reservas", label: "Reservas del día" },
+  { key: "historial", label: "Historial" },
+  { key: "ingresos", label: "Ingresos" },
 ];
 
-    return(
-        <div className="min-h-screen bg-[oklch(14.8%_0.004_228.8)] text-white overflow-hidden">
-  {/* Glow */}
-  <div className="absolute top-0 left-0 w-72 h-72 bg-red-500/20 blur-3xl rounded-full" />
-  <div className="absolute bottom-0 right-0 w-72 h-72 bg-red-500/10 blur-3xl rounded-full" />
+export default function PanelAdmin() {
+  const [tabActiva, setTabActiva] = useState("usuarios");
+  const [stats, setStats] = useState({
+    totalUsuarios: null,
+    reservasHoy: null,
+    turnosLibresHoy: null,
+    ingresosMes: null,
+  });
 
-  <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-    {/* Hero */}
-    <section className="flex flex-col xl:flex-row items-center justify-between gap-12">
-      <div className="max-w-3xl">
-        <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-red-500/30 bg-red-500/10 text-red-400 text-sm font-medium">
-          Panel administrativo
-        </span>
+  useEffect(() => {
+    const getStats = async () => {
+      try {
+        const res = await axios.get(`${API}/panelAdmin/getStats`);
+        if (res.data.success) setStats(res.data.stats);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getStats();
+  }, []);
 
-        <h1 className="mt-6 text-5xl md:text-7xl font-black tracking-tight leading-none">
-          Control total de la
-          <span className="block text-red-500">plataforma</span>
-        </h1>
+  const formatPrecio = (v) =>
+    v != null
+      ? new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(v)
+      : "—";
 
-        <p className="mt-6 text-slate-400 text-lg leading-relaxed max-w-2xl">
-          Administrá usuarios, monitoreá actividad y controlá cada sección
-          del sistema desde un único lugar.
-        </p>
+  const statCards = [
+    { icon: Users, label: "Usuarios", value: stats.totalUsuarios ?? "—", sub: "Registrados en el sistema" },
+    { icon: Calendar, label: "Reservas hoy", value: stats.reservasHoy ?? "—", sub: "Reservas del día actual" },
+    { icon: Clock, label: "Turnos libres", value: stats.turnosLibresHoy ?? "—", sub: "Disponibles para hoy" },
+    { icon: CircleDollarSign, label: "Ingresos del mes", value: formatPrecio(stats.ingresosMes), sub: "Reservas confirmadas" },
+  ];
 
-        <div className="mt-10 flex flex-wrap gap-4">
-          <button className="px-6 py-3 rounded-2xl bg-red-500 hover:bg-red-400 transition-all duration-200 font-semibold shadow-lg shadow-red-500/20">
-            Ir al dashboard
-          </button>
-
-          <button className="px-6 py-3 rounded-2xl border border-slate-700 bg-[oklch(21%_0.006_285.885)] hover:border-red-500/40 transition-all duration-200">
-            Ver reportes
-          </button>
-        </div>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-lg">
-        {[
-          { label: "Usuarios", value: "1.240" },
-          { label: "Activos hoy", value: "312" },
-          { label: "Tickets", value: "18" },
-          { label: "Errores", value: "2" },
-        ].map((item) => (
-          <div
-            key={item.label}
-            className="rounded-3xl border border-slate-800 bg-[oklch(21%_0.006_285.885)] p-6"
-          >
-            <p className="text-slate-400 text-sm">{item.label}</p>
-
-            <h3 className="mt-3 text-3xl font-black text-white">
-              {item.value}
-            </h3>
+  return (
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+      {/* Header */}
+      <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-20">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center text-base font-bold shadow-lg shadow-red-500/30 shrink-0">
+              A
+            </div>
+            <div>
+              <h1 className="text-base sm:text-lg font-bold tracking-tight text-white leading-none">
+                Panel Admin
+              </h1>
+              <p className="text-xs text-zinc-500 mt-0.5">Gestión general del sistema</p>
+            </div>
           </div>
-        ))}
-      </div>
-    </section>
-
-    {/* Modules */}
-    <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 mt-24">
-      {modules.map(({ title, description, icon: Icon }) => (
-        <div
-          key={title}
-          className="group relative overflow-hidden rounded-3xl border border-slate-800 bg-[oklch(21%_0.006_285.885)] p-6 hover:border-red-500/40 transition-all duration-300 hover:-translate-y-1"
-        >
-          <div className="absolute top-0 right-0 w-24 h-24 bg-red-500/5 rounded-bl-full" />
-
-          <div className="w-14 h-14 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
-            <Icon className="text-red-400" size={28} />
-          </div>
-
-          <h3 className="mt-6 text-xl font-semibold">
-            {title}
-          </h3>
-
-          <p className="mt-3 text-slate-400 text-sm leading-relaxed">
-            {description}
-          </p>
-
-          <button className="mt-6 text-red-400 text-sm flex items-center gap-2 group-hover:gap-3 transition-all duration-200">
-            Administrar
-          </button>
         </div>
-      ))}
-    </section>
-  </div>
-</div>
-    )
+      </header>
+
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+          {statCards.map(({ icon: Icon, label, value, sub }) => (
+            <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+              <div className="flex items-center gap-1.5 text-zinc-500 mb-2">
+                <Icon size={13} />
+                <span className="text-xs">{label}</span>
+              </div>
+              <p className="text-2xl font-bold text-white leading-none mb-1">{value}</p>
+              <p className="text-xs text-zinc-600">{sub}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-2 mb-5 flex-wrap">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setTabActiva(tab.key)}
+              className={`px-4 py-2 rounded-lg text-sm font-semibold border transition-all duration-150 ${
+                tabActiva === tab.key
+                  ? "bg-red-500 border-red-500 text-white shadow-lg shadow-red-500/20"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-zinc-200 hover:border-zinc-600"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Contenido */}
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+          {tabActiva === "usuarios"  && <NavegadorModalUsuario />}
+          {tabActiva === "reservas"  && <NavegadorModalReservas />}
+          {tabActiva === "historial" && <NavegadorModalHistorial />}
+          {tabActiva === "ingresos"  && <NavegadorModalIngresos />}
+        </div>
+      </main>
+    </div>
+  );
 }

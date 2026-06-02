@@ -73,6 +73,7 @@ CREATE TABLE IF NOT EXISTS turno (
     estado ENUM(
         'disponible',
         'reservado',
+        'bloqueado',
         'cancelado'
     ) DEFAULT 'disponible',
 

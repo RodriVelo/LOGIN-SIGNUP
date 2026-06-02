@@ -13,3 +13,24 @@ export const getCanchasModel = async () => {
   }
 };
 
+export const editarCanchaModel = async (id, canchaData) => {
+  try {
+    console.log(canchaData)
+    console.log(id)
+    await pool.query(
+      `
+      UPDATE cancha
+      SET nombre = ?, precio = ?, activa = ?
+      WHERE id = ?
+      `,
+      [
+        canchaData.nombre,
+        canchaData.precio,
+        canchaData.activa,
+        id
+      ]
+    );
+  } catch (error) {
+    throw error;
+  }
+};

@@ -1,4 +1,4 @@
-import { getTurnosModel } from "../models/turnosModels.js"
+import { getTurnosModel , bloquearTurnoModel } from "../models/turnosModels.js"
 
 export const getTurnos = async (req, res) => {
   try {
@@ -23,3 +23,22 @@ export const getTurnos = async (req, res) => {
   }
 };
 
+
+export const bloquearTurno = async (req, res) =>{
+  try {
+    const { turno_id } = req.params;
+    await bloquearTurnoModel(turno_id);
+    res.json({
+      sucess: true,
+      message: "Turno bloqueado correctamente"
+    })
+
+  }catch(error){
+    console.log(error);
+    
+    res.status(500).json({
+      sucess:false,
+      message:"Error al bloquear turno"
+    })
+  }
+}

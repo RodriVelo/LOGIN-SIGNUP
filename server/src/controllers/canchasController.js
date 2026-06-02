@@ -1,5 +1,5 @@
 
-import { getCanchasModel } from "../models/canchasModels.js";
+import { getCanchasModel, editarCanchaModel } from "../models/canchasModels.js";
 
 export const getCanchas = async (req, res) => {
   try {
@@ -22,3 +22,20 @@ export const getCanchas = async (req, res) => {
   }
 };
 
+export const editarCancha = async (req, res) => {
+  try {
+    await editarCanchaModel(req.params.cancha_id, req.body);
+
+    res.json({
+      success: true,
+      message: "Se ha editado correctamente la cancha",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      success: false,
+      message: "Error al editar la cancha",
+    });
+  }
+};

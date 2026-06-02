@@ -25,3 +25,24 @@ export const realizarReservaModel = async ({ usuario_id, turno_id, fecha, horari
     [turno_id]
   );
 };
+
+
+export const cancelarReservaModel = async (reserva_id) => {
+
+  const [reserva] = await pool.query(
+    "SELECT turno_id FROM reserva WHERE id = ?",
+    [reserva_id]
+  );
+
+  const turno_id = reserva[0].turno_id;
+
+  await pool.query(
+    "DELETE FROM reserva WHERE id = ?",
+    [reserva_id]
+  );
+
+  await pool.query(
+    "UPDATE turno SET estado = 'disponible' WHERE id = ?",
+    [turno_id]
+  );
+};

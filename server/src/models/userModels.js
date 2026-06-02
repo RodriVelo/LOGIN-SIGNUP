@@ -16,7 +16,7 @@ export const getUserModel = async (id) => {
   }
 };
 export const updateUserModel = async (userId, userData) => {
-  console.log(userData)
+
   const { nombre, apellido, email,nro_documento, telefono } = userData;
 
   const [result] = await pool.query(
