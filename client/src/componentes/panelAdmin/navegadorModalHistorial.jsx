@@ -43,10 +43,10 @@ export default function NavegadorModalHistorial() {
     const getData = async () => {
       try {
         const [resReservas, resCanchas] = await Promise.all([
-          axios.get(`${API}/admin/getHistorial`),
+          axios.get(`${API}/panelAdmin/getHistorial`),
           axios.get(`${API}/canchas/getCanchas`),
         ]);
-        if (resReservas.data.success) setReservas(resReservas.data.reservas);
+        if (resReservas.data.success) setReservas(resReservas.data.historial);
         if (resCanchas.data.success) setCanchas(resCanchas.data.canchas);
       } catch (err) {
         console.error(err);

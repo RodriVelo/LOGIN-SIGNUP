@@ -46,18 +46,19 @@ const logout = () => {
   setIsAuthenticated(false);
 };
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        isAuthenticated,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+    return (
+      <AuthContext.Provider
+        value={{
+          user,
+          isAuthenticated,
+          loading,   // ← faltaba esto
+          login,
+          logout,
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    );
 }
 
 export const useAuth = () => useContext(AuthContext);

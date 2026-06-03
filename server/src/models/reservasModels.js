@@ -26,23 +26,32 @@ export const realizarReservaModel = async ({ usuario_id, turno_id, fecha, horari
   );
 };
 
+export const cancelarReservaModel = async (id) => {
+  console.log(id)
+  const conn = await pool.getConnection();
+  try {
+    await conn.beginTransaction();
 
-export const cancelarReservaModel = async (reserva_id) => {
+    // 1. Cancelar la reserva
+    await conn.query(
+      `UPDATE reserva SET estado = 'cancelada' WHERE id = ?`,
+      [id]
+    );
 
-  const [reserva] = await pool.query(
-    "SELECT turno_id FROM reserva WHERE id = ?",
-    [reserva_id]
-  );
+    // 2. Liberar el turno
+    await conn.query(
+      `UPDATE turno t
+       JOIN reserva r ON r.turno_id = t.id
+       SET t.estado = 'disponible'
+       WHERE r.id = ?`,
+      [id]
+    );
 
-  const turno_id = reserva[0].turno_id;
-
-  await pool.query(
-    "DELETE FROM reserva WHERE id = ?",
-    [reserva_id]
-  );
-
-  await pool.query(
-    "UPDATE turno SET estado = 'disponible' WHERE id = ?",
-    [turno_id]
-  );
+    await conn.commit();
+  } catch (error) {
+    await conn.rollback();
+    throw error;
+  } finally {
+    conn.release();
+  }
 };

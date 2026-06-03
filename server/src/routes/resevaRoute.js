@@ -9,6 +9,6 @@ router.post(`/realizarReserva`, authenticateToken, realizarReserva)
 
 // ------ RUTAS ADMIN -------
 
-router.delete("/cancelarReserva/:reserva_id", authenticateToken, cancelarReserva);
+router.patch("/cancelarReserva/:reserva_id", authenticateToken, cancelarReserva);
 
 export default router;

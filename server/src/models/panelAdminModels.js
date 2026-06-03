@@ -41,3 +41,112 @@ export const getStatsModel = async () => {
     throw error;
   }
 };
+
+
+export const getUsersModel = async () => {
+  try {
+
+    const [rows] = await pool.query(
+      `SELECT
+          u.id,
+          u.nombre,
+          u.apellido,
+          u.nro_documento,
+          u.email,
+          u.telefono,
+          r.tipo AS rol
+      FROM usuario u
+      JOIN rol r ON u.id_rol = r.id`
+    );
+
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const getReservasHoyModel = async () => {
+  try {
+    
+ 
+    const [rows] = await pool.query(
+      `SELECT 
+        r.id,
+        r.estado,
+        u.nombre,
+        u.apellido,
+        u.telefono,
+        t.horario_inicio,
+        c.nombre AS cancha_nombre
+      FROM reserva r
+      JOIN turno t ON t.id = r.turno_id
+      JOIN usuario u ON u.id = r.usuario_id
+      JOIN cancha c ON c.id = t.cancha_id
+      WHERE t.fecha = CURDATE()`
+    );
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getHistorialModel = async () => {
+  try {
+    const [rows] = await pool.query(
+      `SELECT 
+          r.id,
+          r.estado,
+          u.nombre,
+          u.apellido,
+          u.telefono,
+          t.fecha,
+          t.horario_inicio,
+          t.cancha_id,
+          c.nombre AS cancha_nombre,
+          c.precio
+        FROM reserva r
+        JOIN turno t ON t.id = r.turno_id
+        JOIN usuario u ON u.id = r.usuario_id
+        JOIN cancha c ON c.id = t.cancha_id
+        ORDER BY t.fecha DESC`
+    );
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+export const getIngresosModel = async (mes, anio) => {
+  const [resumen] = await pool.query(
+    `SELECT 
+      COUNT(*) AS totalReservas,
+      SUM(c.precio) AS totalMes,
+      AVG(c.precio) AS promedioPorReserva
+    FROM reserva r
+    JOIN turno t ON t.id = r.turno_id
+    JOIN cancha c ON c.id = t.cancha_id
+    WHERE r.estado = 'confirmada'
+      AND MONTH(t.fecha) = ?
+      AND YEAR(t.fecha) = ?`,
+    [mes, anio]
+  );
+
+  const [porCancha] = await pool.query(
+    `SELECT 
+      c.id AS cancha_id,
+      c.nombre AS cancha_nombre,
+      SUM(c.precio) AS total
+    FROM reserva r
+    JOIN turno t ON t.id = r.turno_id
+    JOIN cancha c ON c.id = t.cancha_id
+    WHERE r.estado = 'confirmada'
+      AND MONTH(t.fecha) = ?
+      AND YEAR(t.fecha) = ?
+    GROUP BY c.id, c.nombre`,
+    [mes, anio]
+  );
+
+  return { ...resumen[0], porCancha };
+};

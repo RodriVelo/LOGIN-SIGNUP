@@ -470,7 +470,7 @@ export default function CanchasAdmin({
   const handleCancelar = async (turno) => {
     setCancelando(true);
     try {
-      const response = await axios.delete(
+      const response = await axios.patch(
         `${API}/reservas/cancelarReserva/${turno.reserva_id}`,
       );
       if (response.data.success) {

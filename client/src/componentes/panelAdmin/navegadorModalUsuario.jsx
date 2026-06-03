@@ -109,8 +109,10 @@ export default function NavegadorModalUsuario() {
   useEffect(() => {
     const getUsuarios = async () => {
       try {
-        const res = await axios.get(`${API}/admin/getUsuarios`);
-        if (res.data.success) setUsuarios(res.data.usuarios);
+        const res = await axios.get(`${API}/panelAdmin/getUsers`);
+        if (res.data.success) 
+
+         setUsuarios(res.data.users);
       } catch (err) {
         console.error(err);
       } finally {
@@ -126,7 +128,8 @@ export default function NavegadorModalUsuario() {
       u.nombre?.toLowerCase().includes(q) ||
       u.apellido?.toLowerCase().includes(q) ||
       u.email?.toLowerCase().includes(q) ||
-      u.nro_documento?.toString().includes(q)
+      u.nro_documento?.toString().includes(q) ||
+      u.rol?.toString().includes(q)
     );
   });
 

@@ -14,23 +14,17 @@ export const realizarReserva = async (req, res) => {
   }
 };
 
-
 export const cancelarReserva = async (req, res) => {
+
+  const id = req.params.reserva_id;
   try {
-    const { reserva_id } = req.params;
 
-    await cancelarReservaModel(reserva_id);
-
-    res.json({
-      success: true,
-      message: "Reserva cancelada correctamente",
-    });
+    await cancelarReservaModel(id);
+    res.json({ success: true, 
+      message: "Reserva cancelada correctamente"});
   } catch (error) {
-    console.log(error);
-
     res.status(500).json({
-      success: false,
-      message: "Error al cancelar reserva",
-    });
+      success: false, 
+      message: "Error al cancelar reserva" });
   }
 };

@@ -8,7 +8,7 @@ import CanchasClient from "../../componentes/canchas/canchasClient";
 const API = import.meta.env.VITE_API_URL;
 
 export default function Canchas() {
-  const { user } = useAuth();
+  const { user, authLoading} = useAuth();
 
   const [canchas, setCanchas] = useState([]);
   const [turnos, setTurnos] = useState([]);
@@ -21,28 +21,29 @@ export default function Canchas() {
 
   const [error, setError] = useState(null);
 
-    useEffect(() => {
-      const getCanchas = async () => {
-        try {
-          const response = await axios.get(`${API}/canchas/getCanchas`);
-          if (response.data.success) {
-            const todasLasCanchas = response.data.canchas;
-            const activas = todasLasCanchas.filter((c) => c.activa === 1);
-            const canchasAMostrar = user?.rol === "admin" ? todasLasCanchas : activas;
+useEffect(() => {
+  if (authLoading) return; // espera que termine el auth
 
-            setCanchas(canchasAMostrar);
-            if (canchasAMostrar.length > 0) setCanchaAbierta(canchasAMostrar[0].id);
-          }
-        } catch (err) {
-          console.error(err);
-          setError("No se pudieron cargar las canchas.");
-        } finally {
-          setLoading(false);
-        }
-      };
+  const getCanchas = async () => {
+    try {
+      const response = await axios.get(`${API}/canchas/getCanchas`);
+      if (response.data.success) {
+        const todasLasCanchas = response.data.canchas;
+        const activas = todasLasCanchas.filter((c) => c.activa === 1);
+        const canchasAMostrar = user?.rol === "admin" ? todasLasCanchas : activas;
+        setCanchas(canchasAMostrar);
+        if (canchasAMostrar.length > 0) setCanchaAbierta(canchasAMostrar[0].id);
+      }
+    } catch (err) {
+      console.error(err);
+      setError("No se pudieron cargar las canchas.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-      if (user !== null) getCanchas(); // ← espera a que user esté disponible
-    }, [user]); // ← agrega user como dependencia
+  getCanchas();
+}, [authLoading]); // ← se ejecuta cuando authLoading pasa a false
 
   useEffect(() => {
     const getTurnos = async () => {

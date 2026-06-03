@@ -82,8 +82,10 @@ export default function NavegadorModalReservas() {
     const getReservas = async () => {
       try {
         const hoy = new Date().toISOString().split("T")[0];
-        const res = await axios.get(`${API}/admin/getReservasHoy`, { params: { fecha: hoy } });
-        if (res.data.success) setReservas(res.data.reservas);
+        const res = await axios.get(`${API}/panelAdmin/getReservasHoy`, { params: { fecha: hoy } });
+        if (res.data.success) 
+          
+          setReservas(res.data.reservas);
       } catch (err) {
         console.error(err);
       } finally {

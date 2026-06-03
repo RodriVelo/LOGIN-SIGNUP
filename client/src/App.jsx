@@ -38,14 +38,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route
+         <Route
             path="/admin"
             element={
-              <ProtectedRoute>
+              <ProtectedRoute rolPermitido="admin">
                 <PanelAdmin />
               </ProtectedRoute>
             }
-          />
+/>
           <Route
             path="/users"
             element={

@@ -29,7 +29,7 @@ export default function NavegadorModalIngresos() {
     const getIngresos = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API}/admin/getIngresos`, { params: { mes, anio } });
+        const res = await axios.get(`${API}/panelAdmin/getIngresos`, { params: { mes, anio } });
         if (res.data.success) setData(res.data);
       } catch (err) {
         console.error(err);

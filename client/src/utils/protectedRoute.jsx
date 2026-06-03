@@ -3,7 +3,11 @@ import { Navigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 
+
 const ProtectedRoute = ({ children, rolPermitido }) => {
+
+
+
   const [loading, setLoading] = useState(true);
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -24,7 +28,7 @@ const ProtectedRoute = ({ children, rolPermitido }) => {
       );
 
       const userData = response.data.user;
-
+  
       // Verificar roles si se especifican
       if (rolPermitido) {
         const rolesPermitidos = Array.isArray(rolPermitido)
@@ -34,12 +38,12 @@ const ProtectedRoute = ({ children, rolPermitido }) => {
         let tienePermiso = false;
 
         for (const rol of rolesPermitidos) {
-          if (rol === "admin" && userData.rol === 1) {
+          if (rol === "admin" && userData.rol === "admin") {
             tienePermiso = true;
             break;
           }
 
-          if (rol === "cliente" && userData.rol === 2) {
+          if (rol === "cliente" && userData.rol === "admin") {
             tienePermiso = true;
             break;
           }
@@ -102,7 +106,7 @@ if (loading) {
 
   // No autenticado
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   // Autenticado
