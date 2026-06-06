@@ -13,7 +13,7 @@ import ProtectedRoute from "./utils/protectedRoute";
 
 import Perfil from "./pages/user/perfil";
 import PanelAdmin from "./pages/admin/panelAdmin";
-import Users from "./pages/admin/users";
+import PanelAdminUsers from "./pages/admin/panelAdminUsers";
 import Canchas from "./pages/canchas/canchas";
 import { AuthProvider } from "./utils/authContext";
 
@@ -49,8 +49,8 @@ function App() {
           <Route
             path="/users"
             element={
-              <ProtectedRoute>
-                <Users />
+              <ProtectedRoute rolPermitido="admin">
+                <PanelAdminUsers />
               </ProtectedRoute>
             }
           />

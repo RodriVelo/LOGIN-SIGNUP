@@ -54,6 +54,7 @@ export const getUsersModel = async () => {
           u.nro_documento,
           u.email,
           u.telefono,
+          u.estado,
           r.tipo AS rol
       FROM usuario u
       JOIN rol r ON u.id_rol = r.id`

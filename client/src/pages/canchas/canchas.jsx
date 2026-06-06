@@ -23,6 +23,7 @@ export default function Canchas() {
 
 useEffect(() => {
   if (authLoading) return; // espera que termine el auth
+   if (user === null) return;
 
   const getCanchas = async () => {
     try {
@@ -43,7 +44,7 @@ useEffect(() => {
   };
 
   getCanchas();
-}, [authLoading]); // ← se ejecuta cuando authLoading pasa a false
+}, [authLoading,user]); // ← se ejecuta cuando authLoading pasa a false
 
   useEffect(() => {
     const getTurnos = async () => {

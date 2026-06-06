@@ -23,11 +23,11 @@ CREATE TABLE IF NOT EXISTS usuario (
     google_id VARCHAR(255) UNIQUE,
 
     id_rol INT NOT NULL DEFAULT 2,
+    estado ENUM('activo', 'inactivo', 'suspendido') NOT NULL DEFAULT 'activo',
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    ON UPDATE CURRENT_TIMESTAMP,
+        ON UPDATE CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_usuario_rol
         FOREIGN KEY (id_rol)
