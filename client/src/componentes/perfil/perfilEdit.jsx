@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { toast } from "react-toastify";
 
-export default function PerfilEdit({ userData, onSave, onCancel, loading }) {
+export default function PerfilEdit({ userData, onSave, onCancel, loading , avisoTelefono}) {
   const userSession = JSON.parse(sessionStorage.getItem("userData"));
   const user = userSession?.userData || userSession;
 
@@ -81,9 +81,20 @@ export default function PerfilEdit({ userData, onSave, onCancel, loading }) {
   };
 
   return (
+ 
+
     <div className="min-h-screen bg-[oklch(14.8%_0.004_228.8)] flex items-center justify-center p-6 font-mono">
-        <div className="relative z-10 w-full max-w-lg rounded-3xl border border-white/10 bg-white/8 backdrop-blur-xl shadow-2xl p-6 sm:p-8">
-      {/* Header */}
+   
+      <div className="relative z-10 w-full max-w-lg rounded-3xl border border-white/10 bg-white/8 backdrop-blur-xl shadow-2xl p-6 sm:p-8">
+  
+  {/* Banner aviso teléfono */}
+  {avisoTelefono && (
+    <div className="flex items-center gap-2 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-3 mb-5">
+      <span className="text-amber-400 text-xs">
+        ⚠️ Completá tu teléfono y DNi para poder hacer reservas.
+      </span>
+    </div>
+  )}
      <form onSubmit={handleSubmit} className="space-y-5">
   {/* Nombre + Apellido */}
   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -325,5 +336,5 @@ export default function PerfilEdit({ userData, onSave, onCancel, loading }) {
 </form>
       </div>
     </div>
-  );
+    );
 }

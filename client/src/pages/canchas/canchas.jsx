@@ -22,8 +22,7 @@ export default function Canchas() {
   const [error, setError] = useState(null);
 
 useEffect(() => {
-  if (authLoading) return; // espera que termine el auth
-   if (user === null) return;
+  if (authLoading) return;
 
   const getCanchas = async () => {
     try {
@@ -31,6 +30,7 @@ useEffect(() => {
       if (response.data.success) {
         const todasLasCanchas = response.data.canchas;
         const activas = todasLasCanchas.filter((c) => c.activa === 1);
+        // Si no hay user (null), tratarlo como cliente → solo activas
         const canchasAMostrar = user?.rol === "admin" ? todasLasCanchas : activas;
         setCanchas(canchasAMostrar);
         if (canchasAMostrar.length > 0) setCanchaAbierta(canchasAMostrar[0].id);
@@ -44,8 +44,7 @@ useEffect(() => {
   };
 
   getCanchas();
-}, [authLoading,user]); // ← se ejecuta cuando authLoading pasa a false
-
+}, [authLoading, user]);
   useEffect(() => {
     const getTurnos = async () => {
       setLoadingTurnos(true);

@@ -5,8 +5,12 @@ import {
   Trophy,
   ArrowRight,
 } from "lucide-react";
+import { useEffect } from "react";
 
 export default function Home() {
+  useEffect(() => {
+  window.scrollTo(0, 0);
+}, []);
   const cards = [
     {
       title: "Usuarios",

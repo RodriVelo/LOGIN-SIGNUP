@@ -29,12 +29,12 @@ export const getTurnosModel = async (fecha) => {
   }
 };
 
-export const bloquearTurnoModel = async (turno_id) =>{
+export const bloquearTurnoModel = async (turno_id, nuevoEstado) =>{
   try {
     await pool.query(
       `UPDATE turno
-      SET estado = 'bloqueado'
-      WHERE id = ?`, [turno_id]
+      SET estado = ? 
+      WHERE id = ?`, [nuevoEstado,turno_id]
     )
   } catch (error) {
     throw error;

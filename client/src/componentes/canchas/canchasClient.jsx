@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useAuth } from "../../utils/authContext";
 import { useNavigate } from "react-router-dom";
-
+import ModalConfirmacion from "../modalConfirmacion"
 const API = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
@@ -53,6 +53,18 @@ export default function CanchasClient({
     (t) => t.estado === "disponible",
   ).length;
 
+
+
+  const [confirmacion, setConfirmacion] = useState(null);
+
+  const pedirConfirmacion = (mensaje, accion) => {
+    setConfirmacion({ mensaje, accion });
+  };
+
+  const handleConfirmar = () => {
+    confirmacion.accion();
+    setConfirmacion(null);
+  };
   const ejecutarReserva = async (turno) => {
     setReservando({ cancha_id: turno.cancha_id, hora: turno.horario_inicio });
     try {
@@ -351,7 +363,13 @@ export default function CanchasClient({
                               </div>
                             ) : (
                               <button
-                                onClick={() => handleReservar(turno)}
+                              onClick={() =>
+                                            pedirConfirmacion(
+                                              `¿Querés reservar el turno de las ${turno.horario_inicio}?`,
+                                              () => handleReservar(turno),
+                                            )
+                                          }
+                       
                                 disabled={!!cargando}
                                 className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all duration-150 ${
                                   cargando
@@ -409,6 +427,14 @@ export default function CanchasClient({
             )}
           </>
         )}
+
+         {confirmacion && (
+                  <ModalConfirmacion
+                    mensaje={confirmacion.mensaje}
+                    onConfirmar={handleConfirmar}
+                    onCancelar={() => setConfirmacion(null)}
+                  />
+                )}
       </main>
     </div>
   );

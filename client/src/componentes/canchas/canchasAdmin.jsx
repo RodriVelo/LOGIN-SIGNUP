@@ -1,24 +1,32 @@
 import { useState } from "react";
 import axios from "axios";
+import ModalConfirmacion from "../modalConfirmacion";
 
 const API = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
-const formatPrecio = (precio) =>
+// ─────────────────────────────────────────────
+// Utils
+// ─────────────────────────────────────────────
+
+export const formatPrecio = (precio) =>
   new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
     maximumFractionDigits: 0,
   }).format(precio);
 
-const formatFecha = (fechaStr) => {
+export const formatFecha = (fechaStr) => {
   if (!fechaStr) return "";
   const [year, month, day] = fechaStr.split("-");
   return `${day}/${month}/${year}`;
 };
 
-// ── Spinner ──────────────────────────────────────────────
-function Spinner({ size = "md", color = "red" }) {
+// ─────────────────────────────────────────────
+// Spinner
+// ─────────────────────────────────────────────
+
+export function Spinner({ size = "md", color = "red" }) {
   const s = size === "sm" ? "w-4 h-4 border" : "w-7 h-7 border-2";
   const c = color === "red" ? "border-t-red-500" : "border-t-zinc-300";
   return (
@@ -26,44 +34,24 @@ function Spinner({ size = "md", color = "red" }) {
   );
 }
 
-// ── Banner de error ───────────────────────────────────────
-function BannerError({ error, onClose }) {
+// ─────────────────────────────────────────────
+// BannerError
+// ─────────────────────────────────────────────
+
+export function BannerError({ error, onClose }) {
   if (!error) return null;
   return (
     <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 text-sm font-medium">
       <div className="flex items-center gap-2">
-        <svg
-          className="w-4 h-4 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
+        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         {error}
       </div>
       {onClose && (
-        <button
-          onClick={onClose}
-          className="hover:text-red-300 transition-colors"
-        >
-          <svg
-            className="w-4 h-4"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
+        <button onClick={onClose} className="hover:text-red-300 transition-colors">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       )}
@@ -71,18 +59,15 @@ function BannerError({ error, onClose }) {
   );
 }
 
-// ── Card de turno (admin) ─────────────────────────────────
-function CardTurnoAdmin({
-  turno,
-  canchaId,
-  onVerReserva,
-  onBloquear,
-  bloqueando,
-}) {
+// ─────────────────────────────────────────────
+// CardTurnoAdmin
+// ─────────────────────────────────────────────
+
+export function CardTurnoAdmin({ turno, onVerReserva, onBloquear, bloqueando, pedirConfirmacion }) {
   const disponible = turno.estado === "disponible";
-  const reservado = turno.estado === "reservado";
-  const bloqueado = turno.estado === "bloqueado";
-  const cargando = bloqueando?.turno_id === turno.id;
+  const reservado  = turno.estado === "reservado";
+  const bloqueado  = turno.estado === "bloqueado";
+  const cargando   = bloqueando?.turno_id === turno.id;
 
   return (
     <div
@@ -101,11 +86,7 @@ function CardTurnoAdmin({
         </span>
         <span
           className={`w-2 h-2 rounded-full shrink-0 ${
-            bloqueado
-              ? "bg-yellow-500"
-              : reservado
-                ? "bg-blue-400"
-                : "bg-emerald-500"
+            bloqueado ? "bg-yellow-500" : reservado ? "bg-blue-400" : "bg-emerald-500"
           }`}
         />
       </div>
@@ -113,18 +94,10 @@ function CardTurnoAdmin({
       {/* Estado / usuario */}
       <p
         className={`text-xs truncate ${
-          reservado
-            ? "text-blue-300 font-medium"
-            : bloqueado
-              ? "text-yellow-400/70"
-              : "text-zinc-500"
+          reservado ? "text-blue-300 font-medium" : bloqueado ? "text-yellow-400/70" : "text-zinc-500"
         }`}
       >
-        {reservado
-          ? (turno.nombre_usuario ?? "Reservado")
-          : bloqueado
-            ? "Bloqueado"
-            : "Libre"}
+        {reservado ? (turno.nombre_usuario ?? "Reservado") : bloqueado ? "Bloqueado" : "Libre"}
       </p>
 
       {/* Acciones */}
@@ -139,7 +112,7 @@ function CardTurnoAdmin({
 
       {disponible && (
         <button
-          onClick={() => onBloquear(turno)}
+          onClick={() => pedirConfirmacion(`¿Querés bloquear el turno de las ${turno.horario_inicio}?`, () => onBloquear(turno))}
           disabled={!!cargando}
           className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all duration-150 active:scale-95 ${
             cargando
@@ -159,7 +132,7 @@ function CardTurnoAdmin({
 
       {bloqueado && (
         <button
-          onClick={() => onBloquear(turno)}
+          onClick={() => pedirConfirmacion(`¿Querés desbloquear el turno de las ${turno.horario_inicio}?`, () => onBloquear(turno))}
           disabled={!!cargando}
           className={`w-full py-1.5 rounded-lg text-xs font-bold transition-all duration-150 active:scale-95 ${
             cargando
@@ -180,9 +153,26 @@ function CardTurnoAdmin({
   );
 }
 
-// ── Modal: ver reserva + cancelar ────────────────────────
-function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando }) {
+// ─────────────────────────────────────────────
+// ModalReserva
+// ─────────────────────────────────────────────
+
+export function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando, pedirConfirmacion }) {
   if (!turno) return null;
+
+  const filas = [
+    { label: "Cancha",    value: cancha?.nombre },
+    { label: "Fecha",     value: formatFecha(turno.fecha) },
+    { label: "Horario",   value: `${turno.horario_inicio} hs` },
+    { label: "Cliente",   value: turno.nombre_usuario   ?? "—" },
+    { label: "Teléfono",  value: turno.telefono_usuario ?? "—" },
+    { label: "Email",     value: turno.email_usuario    ?? "—" },
+  ];
+
+  const mensajeWA = encodeURIComponent(
+    `Hola ${turno.nombre_usuario ?? ""}! Te avisamos que tu reserva en ${cancha?.nombre} para el ${formatFecha(turno.fecha)} a las ${turno.horario_inicio}hs fue cancelada.`
+  );
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 sm:p-6"
@@ -196,44 +186,19 @@ function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando }) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h2 className="text-base font-bold text-white">Detalle de reserva</h2>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Datos */}
         <div className="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl divide-y divide-zinc-700 text-sm">
-          {[
-            { label: "Cancha", value: cancha?.nombre },
-            { label: "Fecha", value: formatFecha(turno.fecha) },
-            { label: "Horario", value: `${turno.horario_inicio} hs` },
-            { label: "Cliente", value: turno.nombre_usuario ?? "—" },
-            { label: "Teléfono", value: turno.telefono_usuario ?? "—" },
-            { label: "Email", value: turno.email_usuario ?? "—" },
-          ].map(({ label, value }) => (
-            <div
-              key={label}
-              className="flex justify-between items-center px-4 py-3 gap-4"
-            >
+          {filas.map(({ label, value }) => (
+            <div key={label} className="flex justify-between items-center px-4 py-3 gap-4">
               <span className="text-zinc-400 shrink-0">{label}</span>
-              <span className="text-white font-semibold text-right truncate">
-                {value}
-              </span>
+              <span className="text-white font-semibold text-right truncate">{value}</span>
             </div>
           ))}
         </div>
@@ -242,9 +207,7 @@ function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando }) {
         <div className="flex flex-col gap-2">
           {turno.telefono_usuario && (
             <a
-              href={`https://wa.me/${turno.telefono_usuario}?text=${encodeURIComponent(
-                `Hola ${turno.nombre_usuario ?? ""}! Te avisamos que tu reserva en ${cancha?.nombre} para el ${formatFecha(turno.fecha)} a las ${turno.horario_inicio}hs fue cancelada.`,
-              )}`}
+              href={`https://wa.me/${turno.telefono_usuario}?text=${mensajeWA}`}
               target="_blank"
               rel="noreferrer"
               className="w-full py-2.5 bg-green-600/20 hover:bg-green-600/30 border border-green-600/30 text-green-400 font-bold rounded-xl text-sm text-center transition-all duration-150 flex items-center justify-center gap-2"
@@ -257,7 +220,7 @@ function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando }) {
             </a>
           )}
           <button
-            onClick={() => onCancelar(turno)}
+            onClick={() => pedirConfirmacion(`¿Querés cancelar el turno de las ${turno.horario_inicio}?`, () => onCancelar(turno))}
             disabled={cancelando}
             className={`w-full py-2.5 rounded-xl text-sm font-bold transition-all duration-150 active:scale-95 ${
               cancelando
@@ -279,11 +242,14 @@ function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando }) {
   );
 }
 
-// ── Panel lateral: editar cancha ─────────────────────────
-function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
+// ─────────────────────────────────────────────
+// PanelEditarCancha
+// ─────────────────────────────────────────────
+
+export function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
   const [form, setForm] = useState({
     nombre: cancha?.nombre ?? "",
-    tipo: cancha?.tipo ?? "",
+    tipo:   cancha?.tipo   ?? "",
     precio: cancha?.precio ?? "",
     activa: cancha?.activa === 1,
   });
@@ -292,21 +258,13 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
   };
-
-  const handleSubmit = () => onGuardar(cancha.id, form);
 
   return (
     <>
       {/* Overlay */}
-      <div
-        className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-        onClick={onClose}
-      />
+      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
       {/* Panel */}
       <div className="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-zinc-900 border-l border-zinc-700 shadow-2xl flex flex-col">
@@ -316,22 +274,9 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
             <h2 className="text-base font-bold text-white">Editar cancha</h2>
             <p className="text-xs text-zinc-500 mt-0.5">{cancha.nombre}</p>
           </div>
-          <button
-            onClick={onClose}
-            className="text-zinc-500 hover:text-zinc-300 transition-colors"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
@@ -340,9 +285,7 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
         <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
           {/* Nombre */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">
-              Nombre
-            </label>
+            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Nombre</label>
             <input
               name="nombre"
               value={form.nombre}
@@ -353,9 +296,7 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
 
           {/* Precio */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">
-              Precio por hora (ARS)
-            </label>
+            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Precio por hora (ARS)</label>
             <input
               name="precio"
               type="number"
@@ -369,19 +310,13 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
           <div className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3">
             <div>
               <p className="text-sm text-white font-medium">Cancha activa</p>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Si está desactivada no aparece para los clientes
-              </p>
+              <p className="text-xs text-zinc-500 mt-0.5">Si está desactivada no aparece para los clientes</p>
             </div>
             <button
               type="button"
-              onClick={() =>
-                setForm((prev) => ({ ...prev, activa: !prev.activa }))
-              }
+              onClick={() => setForm((prev) => ({ ...prev, activa: !prev.activa }))}
               className={`relative w-11 h-6 rounded-full border transition-all duration-200 shrink-0 ${
-                form.activa
-                  ? "bg-emerald-500 border-emerald-500"
-                  : "bg-zinc-700 border-zinc-600"
+                form.activa ? "bg-emerald-500 border-emerald-500" : "bg-zinc-700 border-zinc-600"
               }`}
             >
               <span
@@ -402,7 +337,7 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
             Cancelar
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={() => onGuardar(cancha.id, form)}
             disabled={guardando}
             className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 active:scale-95 ${
               guardando
@@ -424,7 +359,10 @@ function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
   );
 }
 
-// ── CanchasAdmin (principal) ──────────────────────────────
+// ─────────────────────────────────────────────
+// CanchasAdmin (principal)
+// ─────────────────────────────────────────────
+
 export default function CanchasAdmin({
   canchas,
   setCanchas,
@@ -440,53 +378,45 @@ export default function CanchasAdmin({
   setError,
 }) {
   const [turnoSeleccionado, setTurnoSeleccionado] = useState(null);
-  const [cancelando, setCancelando] = useState(false);
-  const [bloqueando, setBloqueando] = useState(null);
-  const [panelCancha, setPanelCancha] = useState(null);
-  const [guardando, setGuardando] = useState(false);
+  const [cancelando,        setCancelando]        = useState(false);
+  const [bloqueando,        setBloqueando]        = useState(null);
+  const [panelCancha,       setPanelCancha]       = useState(null);
+  const [guardando,         setGuardando]         = useState(false);
+  const [confirmacion,      setConfirmacion]      = useState(null);
 
-  const hoyDate = new Date();
-  const hoy = hoyDate.toISOString().split("T")[0];
-  const maxFecha = new Date(hoyDate);
+  const hoyDate    = new Date();
+  const hoy        = hoyDate.toISOString().split("T")[0];
+  const maxFecha   = new Date(hoyDate);
   maxFecha.setDate(hoyDate.getDate() + 14);
   const maxFechaStr = maxFecha.toISOString().split("T")[0];
 
-  const canchaActual = canchas.find((c) => c.id === canchaAbierta);
-  const turnosCancha = canchaActual
+  const canchaActual  = canchas.find((c) => c.id === canchaAbierta);
+  const turnosCancha  = canchaActual
     ? turnos.filter((t) => Number(t.cancha_id) === Number(canchaActual.id))
     : [];
 
-  const totalLibres = turnosCancha.filter(
-    (t) => t.estado === "disponible",
-  ).length;
-  const totalReservados = turnosCancha.filter(
-    (t) => t.estado === "reservado",
-  ).length;
-  const totalBloqueados = turnosCancha.filter(
-    (t) => t.estado === "bloqueado",
-  ).length;
+  const totalLibres    = turnosCancha.filter((t) => t.estado === "disponible").length;
+  const totalReservados = turnosCancha.filter((t) => t.estado === "reservado").length;
+  const totalBloqueados = turnosCancha.filter((t) => t.estado === "bloqueado").length;
 
-  // Cancelar reserva
+  // ── Confirmación ─────────────────────────────
+
+  const pedirConfirmacion = (mensaje, accion) => setConfirmacion({ mensaje, accion });
+  const handleConfirmar   = () => { confirmacion.accion(); setConfirmacion(null); };
+
+  // ── Cancelar reserva ─────────────────────────
+
   const handleCancelar = async (turno) => {
     setCancelando(true);
     try {
-      const response = await axios.patch(
-        `${API}/reservas/cancelarReserva/${turno.reserva_id}`,
-      );
-      if (response.data.success) {
+      const { data } = await axios.patch(`${API}/reservas/cancelarReserva/${turno.reserva_id}`);
+      if (data.success) {
         setTurnos((prev) =>
           prev.map((t) =>
             t.id === turno.id
-              ? {
-                  ...t,
-                  estado: "disponible",
-                  nombre_usuario: null,
-                  telefono_usuario: null,
-                  email_usuario: null,
-                  reserva_id: null,
-                }
-              : t,
-          ),
+              ? { ...t, estado: "disponible", nombre_usuario: null, telefono_usuario: null, email_usuario: null, reserva_id: null }
+              : t
+          )
         );
         setTurnoSeleccionado(null);
       }
@@ -499,21 +429,15 @@ export default function CanchasAdmin({
     }
   };
 
-  // Bloquear / desbloquear turno
-  const handleBloquear = async (turno) => {
-    const nuevoEstado =
-      turno.estado === "bloqueado" ? "disponible" : "bloqueado";
-    setBloqueando({ turno_id: turno.id });
+  // ── Bloquear / desbloquear turno ─────────────
 
+  const handleBloquear = async (turno) => {
+    const nuevoEstado = turno.estado === "bloqueado" ? "disponible" : "bloqueado";
+    setBloqueando({ turno_id: turno.id });
     try {
-      await axios.put(`${API}/turnos/bloquearTurno/${turno.id}`, {
-        estado: nuevoEstado,
-      });
-      // Actualizamos sin chequear success — si no tira error, funcionó
+      await axios.put(`${API}/turnos/bloquearTurno/${turno.id}`, { estado: nuevoEstado });
       setTurnos((prev) =>
-        prev.map((t) =>
-          t.id === turno.id ? { ...t, estado: nuevoEstado } : t,
-        ),
+        prev.map((t) => (t.id === turno.id ? { ...t, estado: nuevoEstado } : t))
       );
     } catch (err) {
       console.error(err);
@@ -524,18 +448,14 @@ export default function CanchasAdmin({
     }
   };
 
-  // Guardar edición de cancha
+  // ── Guardar edición de cancha ─────────────────
+
   const handleGuardarCancha = async (id, form) => {
     setGuardando(true);
     try {
-      await axios.put(`${API}/canchas/editarCancha/${id}`, {
-        ...form,
-        activa: form.activa ? 1 : 0,
-      });
+      await axios.put(`${API}/canchas/editarCancha/${id}`, { ...form, activa: form.activa ? 1 : 0 });
       setCanchas((prev) =>
-        prev.map((c) =>
-          c.id === id ? { ...c, ...form, activa: form.activa ? 1 : 0 } : c,
-        ),
+        prev.map((c) => (c.id === id ? { ...c, ...form, activa: form.activa ? 1 : 0 } : c))
       );
       setPanelCancha(null);
     } catch (err) {
@@ -547,9 +467,11 @@ export default function CanchasAdmin({
     }
   };
 
+  // ── Render ────────────────────────────────────
+
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
-      {/* Modal reserva */}
+
       {turnoSeleccionado && (
         <ModalReserva
           turno={turnoSeleccionado}
@@ -557,10 +479,10 @@ export default function CanchasAdmin({
           onCancelar={handleCancelar}
           onClose={() => setTurnoSeleccionado(null)}
           cancelando={cancelando}
+          pedirConfirmacion={pedirConfirmacion}
         />
       )}
 
-      {/* Panel editar cancha */}
       {panelCancha && (
         <PanelEditarCancha
           cancha={panelCancha}
@@ -570,7 +492,7 @@ export default function CanchasAdmin({
         />
       )}
 
-      {/* ── Header ── */}
+      {/* Header */}
       <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
@@ -581,25 +503,13 @@ export default function CanchasAdmin({
               <h1 className="text-base sm:text-lg font-bold tracking-tight text-white leading-none">
                 Panel Admin Canchas
               </h1>
-              <p className="text-xs text-zinc-500 mt-0.5">
-                Gestión de canchas y turnos
-              </p>
+              <p className="text-xs text-zinc-500 mt-0.5">Gestión de canchas y turnos</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2">
-            <svg
-              className="w-4 h-4 text-zinc-400 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
+            <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
             <input
               type="date"
@@ -613,7 +523,7 @@ export default function CanchasAdmin({
         </div>
       </header>
 
-      {/* ── Main ── */}
+      {/* Main */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         <BannerError error={error} onClose={() => setError(null)} />
 
@@ -623,12 +533,10 @@ export default function CanchasAdmin({
             <p className="text-zinc-500 text-sm">Cargando canchas...</p>
           </div>
         ) : canchas.length === 0 ? (
-          <p className="text-center text-zinc-500 pt-20 text-sm">
-            No hay canchas registradas.
-          </p>
+          <p className="text-center text-zinc-500 pt-20 text-sm">No hay canchas registradas.</p>
         ) : (
           <>
-            {/* ── Tabs de canchas ── */}
+            {/* Tabs de canchas */}
             <div className="flex gap-2 mb-5 flex-wrap">
               {canchas.map((cancha) => (
                 <button
@@ -641,24 +549,18 @@ export default function CanchasAdmin({
                   }`}
                 >
                   {cancha.nombre}
-                  {cancha.activa === 0 && (
-                    <span className="ml-2 text-xs text-zinc-600">
-                      (inactiva)
-                    </span>
-                  )}
+                  {cancha.activa === 0 && <span className="ml-2 text-xs text-zinc-600">(inactiva)</span>}
                 </button>
               ))}
             </div>
 
             {canchaActual && (
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-                {/* ── Info cancha ── */}
+                {/* Info cancha */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-5 border-b border-zinc-800">
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h2 className="text-lg sm:text-xl font-bold text-white">
-                        {canchaActual.nombre}
-                      </h2>
+                      <h2 className="text-lg sm:text-xl font-bold text-white">{canchaActual.nombre}</h2>
                       <span
                         className={`text-xs px-2 py-0.5 rounded-full border font-semibold ${
                           canchaActual.activa === 1
@@ -680,34 +582,13 @@ export default function CanchasAdmin({
                     {/* Stats */}
                     <div className="flex gap-2">
                       {[
-                        {
-                          label: "Libres",
-                          value: totalLibres,
-                          color: "text-emerald-400",
-                        },
-                        {
-                          label: "Reservados",
-                          value: totalReservados,
-                          color: "text-blue-400",
-                        },
-                        {
-                          label: "Bloqueados",
-                          value: totalBloqueados,
-                          color: "text-yellow-400",
-                        },
+                        { label: "Libres",     value: totalLibres,     color: "text-emerald-400" },
+                        { label: "Reservados", value: totalReservados, color: "text-blue-400"    },
+                        { label: "Bloqueados", value: totalBloqueados, color: "text-yellow-400"  },
                       ].map(({ label, value, color }) => (
-                        <div
-                          key={label}
-                          className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-center min-w-[60px]"
-                        >
-                          <p
-                            className={`text-xl font-black leading-none ${color}`}
-                          >
-                            {value}
-                          </p>
-                          <p className="text-xs text-zinc-500 mt-1 whitespace-nowrap">
-                            {label}
-                          </p>
+                        <div key={label} className="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-center min-w-[60px]">
+                          <p className={`text-xl font-black leading-none ${color}`}>{value}</p>
+                          <p className="text-xs text-zinc-500 mt-1 whitespace-nowrap">{label}</p>
                         </div>
                       ))}
                     </div>
@@ -715,37 +596,23 @@ export default function CanchasAdmin({
                     {/* Precio + editar */}
                     <div className="flex items-center gap-2">
                       <div className="text-right">
-                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-0.5">
-                          Por hora
-                        </p>
-                        <p className="text-xl sm:text-2xl font-bold text-red-400">
-                          {formatPrecio(canchaActual.precio)}
-                        </p>
+                        <p className="text-xs text-zinc-500 uppercase tracking-wider mb-0.5">Por hora</p>
+                        <p className="text-xl sm:text-2xl font-bold text-red-400">{formatPrecio(canchaActual.precio)}</p>
                       </div>
                       <button
                         onClick={() => setPanelCancha(canchaActual)}
                         className="w-9 h-9 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-500 flex items-center justify-center text-zinc-400 hover:text-zinc-200 transition-all duration-150 shrink-0"
                         title="Editar cancha"
                       >
-                        <svg
-                          className="w-4 h-4"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth={2}
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                          />
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
                       </button>
                     </div>
                   </div>
                 </div>
 
-                {/* ── Grid de turnos ── */}
+                {/* Grid de turnos */}
                 <div className="p-4 sm:p-6">
                   {loadingTurnos ? (
                     <div className="flex justify-center py-16">
@@ -754,9 +621,7 @@ export default function CanchasAdmin({
                   ) : turnosCancha.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-zinc-500">
                       <span className="text-3xl">📅</span>
-                      <p className="text-sm font-medium">
-                        No hay turnos para esta fecha
-                      </p>
+                      <p className="text-sm font-medium">No hay turnos para esta fecha</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
@@ -764,27 +629,25 @@ export default function CanchasAdmin({
                         <CardTurnoAdmin
                           key={turno.id}
                           turno={turno}
-                          canchaId={canchaActual.id}
                           onVerReserva={setTurnoSeleccionado}
                           onBloquear={handleBloquear}
                           bloqueando={bloqueando}
+                          pedirConfirmacion={pedirConfirmacion}
                         />
                       ))}
                     </div>
                   )}
                 </div>
 
-                {/* ── Leyenda ── */}
+                {/* Leyenda */}
                 <div className="px-4 sm:px-6 pb-5 flex items-center gap-5 text-xs text-zinc-500 border-t border-zinc-800 pt-4 flex-wrap">
                   {[
-                    { color: "bg-emerald-500", label: "Libre" },
-                    { color: "bg-blue-400", label: "Reservado" },
-                    { color: "bg-yellow-500", label: "Bloqueado" },
+                    { color: "bg-emerald-500", label: "Libre"     },
+                    { color: "bg-blue-400",    label: "Reservado" },
+                    { color: "bg-yellow-500",  label: "Bloqueado" },
                   ].map(({ color, label }) => (
                     <span key={label} className="flex items-center gap-1.5">
-                      <span
-                        className={`w-2 h-2 rounded-full ${color} inline-block`}
-                      />
+                      <span className={`w-2 h-2 rounded-full ${color} inline-block`} />
                       {label}
                     </span>
                   ))}
@@ -792,6 +655,14 @@ export default function CanchasAdmin({
               </div>
             )}
           </>
+        )}
+
+        {confirmacion && (
+          <ModalConfirmacion
+            mensaje={confirmacion.mensaje}
+            onConfirmar={handleConfirmar}
+            onCancelar={() => setConfirmacion(null)}
+          />
         )}
       </main>
     </div>

@@ -51,6 +51,7 @@ export const userLoginModel = async (email, contrasena) => {
               usuario.apellido,
               usuario.email,
               usuario.contrasena,
+              usuario.telefono,
               usuario.google_id,
               rol.tipo AS rol
             FROM usuario

@@ -1,5 +1,6 @@
-import { User, FileText, Mail, Phone, BadgeCheck } from "lucide-react";
-import { useEffect, useState } from "react";
+import { User, FileText, Mail, Phone, BadgeCheck,  } from "lucide-react";
+import { useEffect, useState} from "react";
+import { useNavigate } from "react-router-dom";
 import PerfilEdit from "../../componentes/perfil/perfilEdit";
 
 import axios from "axios";
@@ -15,28 +16,34 @@ export default function Perfil() {
     email: "",
     telefono: "",
   });
-
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
 
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await axios.get(`${API}/user/getUser`, {
-          withCredentials: true,
-        });
+  const [sinTelefono, setSinTelefono] = useState(false);
 
-        if (response.data.success) {
-          setUser(response.data.user);
-        }
-      } catch (err) {
-        console.error(err);
+useEffect(() => {
+  const getUser = async () => {
+    try {
+      const response = await axios.get(`${API}/user/getUser`, {
+        withCredentials: true,
+      });
+      if (response.data.success) {
+        setUser(response.data.user);
+        // Si no tiene teléfono, abrir editor automáticamente
+        if (!response.data.user.telefono) {
+          setSinTelefono(true);
+          setIsEditing(true);
+         
+        } 
       }
-    };
-
-    getUser();
-  }, []);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  getUser();
+}, []);
 
   const initials = `${user.nombre?.[0] || ""}${user.apellido?.[0] || ""}`;
 
@@ -81,6 +88,8 @@ export default function Perfil() {
       if (response.data.success) {
         setUser(response.data.user);
         setIsEditing(false);
+        navigate("/");
+        
       }
     } catch (error) {
       console.error(error);
@@ -95,6 +104,7 @@ export default function Perfil() {
           onSave={handleSaveProfile}
           onCancel={() => setIsEditing(false)}
           loading={loading}
+          avisoTelefono={sinTelefono} // ← nuevo prop
         />
       </section>
     );

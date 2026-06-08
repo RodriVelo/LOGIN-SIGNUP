@@ -25,9 +25,11 @@ export const getTurnos = async (req, res) => {
 
 
 export const bloquearTurno = async (req, res) =>{
+
   try {
+    const nuevoEstado  = req.body.estado
     const { turno_id } = req.params;
-    await bloquearTurnoModel(turno_id);
+    await bloquearTurnoModel(turno_id,nuevoEstado);
     res.json({
       sucess: true,
       message: "Turno bloqueado correctamente"

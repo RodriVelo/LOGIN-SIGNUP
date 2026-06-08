@@ -2,7 +2,6 @@ import { pool } from "../db/connection.js";
 
 export const realizarReservaModel = async ({ usuario_id, turno_id, fecha, horario_inicio }) => {
 
-  // 1. Verificar que el turno existe y está disponible
   const [turnos] = await pool.query(
     `SELECT * FROM turno WHERE id = ? AND estado = 'disponible'`,
     [turno_id]
@@ -12,14 +11,27 @@ export const realizarReservaModel = async ({ usuario_id, turno_id, fecha, horari
     throw new Error("El turno no existe o ya fue reservado");
   }
 
-  // 2. Crear la reserva
-  await pool.query(
-    `INSERT INTO reserva (usuario_id, turno_id, estado, created_at) 
-     VALUES (?, ?, 'confirmada', NOW())`,
-    [usuario_id, turno_id]
+  // Verificar si ya existe una reserva cancelada para ese turno
+  const [reservaExistente] = await pool.query(
+    `SELECT id FROM reserva WHERE turno_id = ?`,
+    [turno_id]
   );
 
-  // 3. Marcar el turno como reservado
+  if (reservaExistente.length > 0) {
+    // Actualizar la reserva existente en vez de insertar
+    await pool.query(
+      `UPDATE reserva SET usuario_id = ?, estado = 'confirmada', created_at = NOW() WHERE turno_id = ?`,
+      [usuario_id, turno_id]
+    );
+  } else {
+    // Insertar nueva reserva
+    await pool.query(
+      `INSERT INTO reserva (usuario_id, turno_id, estado, created_at) 
+       VALUES (?, ?, 'confirmada', NOW())`,
+      [usuario_id, turno_id]
+    );
+  }
+
   await pool.query(
     `UPDATE turno SET estado = 'reservado' WHERE id = ?`,
     [turno_id]

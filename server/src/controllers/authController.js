@@ -92,8 +92,8 @@ export const userLogin = async (req, res) => {
     });
   }
 };
-
 export const googleCallback = async (req, res) => {
+
   try {
     const token = jwt.sign(
       {
@@ -104,9 +104,7 @@ export const googleCallback = async (req, res) => {
         rol: req.user.rol,
       },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      },
+      { expiresIn: "7d" }
     );
 
     res.cookie("token", token, {
@@ -116,12 +114,14 @@ export const googleCallback = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
+    // Si no tiene teléfono, redirigir al perfil para completarlo
+    if (!req.user.telefono) {
+      return res.redirect(`${process.env.CLIENT_URL}/perfil`);
+    }
+
     res.redirect(process.env.CLIENT_URL);
   } catch (error) {
     console.log(error);
-
-    res.status(500).json({
-      message: "Error autenticando con Google",
-    });
+    res.status(500).json({ message: "Error autenticando con Google" });
   }
 };
