@@ -65,37 +65,29 @@ export default function CanchasClient({
     confirmacion.accion();
     setConfirmacion(null);
   };
-  const ejecutarReserva = async (turno) => {
-    setReservando({ cancha_id: turno.cancha_id, hora: turno.horario_inicio });
-    try {
-      const response = await axios.post(`${API}/reservas/realizarReserva`, {
-        usuario_id: user.id,
-        turno_id: turno.id,
-        fecha: turno.fecha,
-        horario_inicio: turno.horario_inicio,
-      });
 
-      if (response.data.success) {
-        setTurnos((prev) =>
-          prev.map((t) =>
-            t.id === turno.id ? { ...t, estado: "reservado" } : t,
-          ),
-        );
-        // Sin setTimeout — el usuario necesita tiempo para leer y usar el botón de WhatsApp
-        setExito({
-          cancha: canchaActual.nombre,
-          fecha: turno.fecha,
-          hora: turno.horario_inicio,
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      setError("No se pudo realizar la reserva. Intentá de nuevo.");
-      setTimeout(() => setError(null), 4000);
-    } finally {
-      setReservando(null);
+const ejecutarReserva = async (turno) => {
+  setReservando({ cancha_id: turno.cancha_id, hora: turno.horario_inicio });
+  try {
+    const response = await axios.post(`${API}/reservas/iniciarPago`, {
+      usuario_id: user.id,
+      turno_id: turno.id,
+      nombre_cancha: canchaActual.nombre,
+      precio: canchaActual.precio,
+    });
+
+    if (response.data.success) {
+      console.log(response.data);
+      // Redirigir a Mercado Pago
+      window.location.href = response.data.init_point;
     }
-  };
+  } catch (error) {
+    setError("No se pudo iniciar el pago. Intentá de nuevo.");
+    setTimeout(() => setError(null), 4000);
+  } finally {
+    setReservando(null);
+  }
+};
 
   const handleReservar = (turno) => {
     if (!user) {

@@ -8,7 +8,7 @@ router.get("/getCanchas",getCanchas)
 
 // ----- RUTAS ADMIN ------
 
-router.put(`/editarCancha/:cancha_id`, editarCancha )
+router.put(`/editarCancha/:cancha_id`, authenticateToken, editarCancha )
 
 
 export default router;

@@ -103,6 +103,10 @@ CREATE TABLE IF NOT EXISTS reserva (
         'cancelada'
     ) DEFAULT 'pendiente',
 
+    mp_payment_id VARCHAR(255) DEFAULT NULL,
+
+    expires_at TIMESTAMP NULL DEFAULT NULL,
+
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT fk_reserva_usuario
@@ -121,7 +125,6 @@ CREATE TABLE IF NOT EXISTS reserva (
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 `;
-
 const insertDefaultRoles = async () => {
   try {
 

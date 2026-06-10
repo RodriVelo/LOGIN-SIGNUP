@@ -28,6 +28,8 @@ useEffect(() => {
     try {
       const response = await axios.get(`${API}/canchas/getCanchas`);
       if (response.data.success) {
+   
+        console.log(response.data.canchas)
         const todasLasCanchas = response.data.canchas;
         const activas = todasLasCanchas.filter((c) => c.activa === 1);
         // Si no hay user (null), tratarlo como cliente → solo activas
@@ -36,6 +38,7 @@ useEffect(() => {
         if (canchasAMostrar.length > 0) setCanchaAbierta(canchasAMostrar[0].id);
       }
     } catch (err) {
+     
       console.error(err);
       setError("No se pudieron cargar las canchas.");
     } finally {
@@ -45,6 +48,7 @@ useEffect(() => {
 
   getCanchas();
 }, [authLoading, user]);
+
   useEffect(() => {
     const getTurnos = async () => {
       setLoadingTurnos(true);

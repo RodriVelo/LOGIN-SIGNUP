@@ -3,6 +3,14 @@ import { pool } from "../db/connection.js";
 export const getTurnosModel = async (fecha) => {
   try {
 
+    // Primero liberar turnos con reservas expiradas
+    await pool.query(
+      `UPDATE turno t
+       JOIN reserva r ON r.turno_id = t.id
+       SET t.estado = 'disponible', r.estado = 'cancelada'
+       WHERE r.estado = 'pendiente' AND r.expires_at < NOW()`
+    );
+
     const [rows] = await pool.query(
       `SELECT 
           t.id,
@@ -16,7 +24,7 @@ export const getTurnosModel = async (fecha) => {
           u.telefono AS telefono_usuario,
           u.email AS email_usuario
         FROM turno t
-        LEFT JOIN reserva r ON r.turno_id = t.id
+        LEFT JOIN reserva r ON r.turno_id = t.id AND r.estado != 'cancelada'
         LEFT JOIN usuario u ON u.id = r.usuario_id
         WHERE t.fecha = ?`,
       [fecha]

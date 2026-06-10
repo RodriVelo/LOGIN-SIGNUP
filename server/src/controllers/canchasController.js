@@ -3,7 +3,7 @@ import { getCanchasModel, editarCanchaModel } from "../models/canchasModels.js";
 
 export const getCanchas = async (req, res) => {
   try {
-
+    
     const canchas = await getCanchasModel();
 
     res.json({
