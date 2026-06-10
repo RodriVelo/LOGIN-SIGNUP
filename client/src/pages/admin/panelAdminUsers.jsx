@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import axios from "axios";
 import ModalConfirmacion from "../../componentes/modalConfirmacion";
+import { toast } from "react-toastify";
+
 
 const API = import.meta.env.VITE_API_URL;
 const TAMANIO_PAGINA = 10;
@@ -65,9 +67,11 @@ export default function PanelAdminUsers() {
         setUsuarios((prev) =>
           prev.map((u) => (u.id === id ? { ...u, estado: nuevoEstado } : u)),
         );
+        toast.success("Estado modificado")
       }
     } catch (error) {
       console.error("Error al cambiar estado:", error);
+      toast.error("Estado no modificado")
     }
   };
 

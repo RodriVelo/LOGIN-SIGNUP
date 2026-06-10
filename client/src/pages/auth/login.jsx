@@ -51,38 +51,39 @@ const Login = () => {
     }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const errors = validateForm();
+  const errors = validateForm();
 
-    if (Object.keys(errors).length > 0) {
-      setFormErrors(errors);
-      toast.error("Por favor corrige los errores");
-      return;
+  if (Object.keys(errors).length > 0) {
+    setFormErrors(errors);
+    toast.error("Por favor corrige los errores");
+    return;
+  }
+
+  try {
+    const { data } = await axios.post(`${API}/auth/login`, formValues, {
+      withCredentials: true,
+    });
+
+    if (data.success) {
+      login(data.user);
+      toast.success("Inicio de sesión exitoso");
+      setFormValues({ email: "", contrasena: "" });
+      navigate("/");
     }
+  } catch (error) {
+    const mensaje = error.response?.data?.message || "Error al iniciar sesión";
+    const status = error.response?.status;
 
-    try {
-      const { data } = await axios.post(`${API}/auth/login`, formValues, {
-        withCredentials: true,
-      });
-
-      if (data.success) {
-        login(data.user);
-
-        toast.success("Inicio de sesión exitoso");
-
-        setFormValues({
-          email: "",
-          contrasena: "",
-        });
-
-        navigate("/");
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message || "Credenciales incorrectas");
+    if (status === 403) {
+      toast.warning(mensaje); // "Esta cuenta fue creada con Google"
+    } else {
+      toast.error(mensaje); // "Usuario no encontrado" / "Credenciales inválidas"
     }
-  };
+  }
+};
 
   return (
     <div className="relative flex items-center justify-center min-h-screen overflow-hidden bg-[oklch(14.8%_0.004_228.8)] px-4 py-10">

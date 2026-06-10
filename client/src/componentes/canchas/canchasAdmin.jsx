@@ -1,6 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import ModalConfirmacion from "../modalConfirmacion";
+import Header from "./compartidos/header";
+import BannerError from "./compartidos/bannerError";
+import TabsCanchas from "./compartidos/tabsCanchas";
+import { toast } from "react-toastify";
 
 const API = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
@@ -38,26 +42,7 @@ export function Spinner({ size = "md", color = "red" }) {
 // BannerError
 // ─────────────────────────────────────────────
 
-export function BannerError({ error, onClose }) {
-  if (!error) return null;
-  return (
-    <div className="mb-5 flex items-center justify-between gap-3 bg-red-500/10 border border-red-500/30 text-red-400 rounded-xl px-4 py-3 text-sm font-medium">
-      <div className="flex items-center gap-2">
-        <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        {error}
-      </div>
-      {onClose && (
-        <button onClick={onClose} className="hover:text-red-300 transition-colors">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      )}
-    </div>
-  );
-}
+
 
 // ─────────────────────────────────────────────
 // CardTurnoAdmin
@@ -419,11 +404,13 @@ export default function CanchasAdmin({
           )
         );
         setTurnoSeleccionado(null);
+        toast.success("La reserva ha sido cancelada")
       }
     } catch (err) {
       console.error(err);
       setError("No se pudo cancelar la reserva.");
       setTimeout(() => setError(null), 4000);
+      toast.error("Error al cancelar la reserva")
     } finally {
       setCancelando(false);
     }
@@ -439,10 +426,17 @@ export default function CanchasAdmin({
       setTurnos((prev) =>
         prev.map((t) => (t.id === turno.id ? { ...t, estado: nuevoEstado } : t))
       );
+      if(nuevoEstado==="bloqueado"){
+        toast.success("El turno ha sido bloqueado")
+      }
+      if(nuevoEstado != "bloqueado"){
+        toast.success("El turno ha sido desbloqueado")
+      }
     } catch (err) {
       console.error(err);
       setError("No se pudo modificar el turno.");
       setTimeout(() => setError(null), 4000);
+      toast.error("El turno no pudo ser bloqueado")
     } finally {
       setBloqueando(null);
     }
@@ -458,10 +452,12 @@ export default function CanchasAdmin({
         prev.map((c) => (c.id === id ? { ...c, ...form, activa: form.activa ? 1 : 0 } : c))
       );
       setPanelCancha(null);
+      toast.success("La cancha ha sido editada")
     } catch (err) {
       console.error(err);
       setError("No se pudo guardar la cancha.");
       setTimeout(() => setError(null), 4000);
+      toast.error("La cancha no ha sido editada")
     } finally {
       setGuardando(false);
     }
@@ -493,35 +489,13 @@ export default function CanchasAdmin({
       )}
 
       {/* Header */}
-      <header className="border-b border-zinc-800 bg-zinc-900/80 backdrop-blur-sm sticky top-0 z-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-red-500 flex items-center justify-center text-lg shadow-lg shadow-red-500/30 shrink-0">
-              ⚽
-            </div>
-            <div>
-              <h1 className="text-base sm:text-lg font-bold tracking-tight text-white leading-none">
-                Panel Admin Canchas
-              </h1>
-              <p className="text-xs text-zinc-500 mt-0.5">Gestión de canchas y turnos</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2">
-            <svg className="w-4 h-4 text-zinc-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <input
-              type="date"
-              min={hoy}
-              max={maxFechaStr}
-              value={fechaSeleccionada}
-              onChange={(e) => setFechaSeleccionada(e.target.value)}
-              className="bg-transparent text-sm text-zinc-100 outline-none cursor-pointer [color-scheme:dark]"
-            />
-          </div>
-        </div>
-      </header>
+     <Header
+        hoy={hoy}
+        maxFechaStr={maxFechaStr}
+        fechaSeleccionada={fechaSeleccionada}
+        setFechaSeleccionada={setFechaSeleccionada}
+      />
+      
 
       {/* Main */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
@@ -537,8 +511,13 @@ export default function CanchasAdmin({
         ) : (
           <>
             {/* Tabs de canchas */}
-            <div className="flex gap-2 mb-5 flex-wrap">
-              {canchas.map((cancha) => (
+            
+              <TabsCanchas
+                canchas={canchas}
+                canchaAbierta={canchaAbierta}
+                setCanchaAbierta={setCanchaAbierta}
+              />
+              {/* {canchas.map((cancha) => (
                 <button
                   key={cancha.id}
                   onClick={() => setCanchaAbierta(cancha.id)}
@@ -551,8 +530,8 @@ export default function CanchasAdmin({
                   {cancha.nombre}
                   {cancha.activa === 0 && <span className="ml-2 text-xs text-zinc-600">(inactiva)</span>}
                 </button>
-              ))}
-            </div>
+              ))} */}
+          
 
             {canchaActual && (
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
@@ -621,7 +600,9 @@ export default function CanchasAdmin({
                   ) : turnosCancha.length === 0 ? (
                     <div className="flex flex-col items-center gap-2 py-16 text-zinc-500">
                       <span className="text-3xl">📅</span>
-                      <p className="text-sm font-medium">No hay turnos para esta fecha</p>
+                      <p className="text-sm font-medium">
+                        No hay turnos para esta fecha
+                        </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">

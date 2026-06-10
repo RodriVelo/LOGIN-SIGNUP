@@ -3,7 +3,7 @@ import { pool } from "../db/connection.js";
 export const getStatsModel = async () => {
   try {
     const [[{ totalUsuarios }]] = await pool.query(
-      `SELECT COUNT(*) as totalUsuarios FROM usuario`
+      `SELECT COUNT(*) as totalUsuarios FROM usuario`,
     );
 
     const hoy = new Date().toISOString().split("T")[0];
@@ -12,19 +12,19 @@ export const getStatsModel = async () => {
       `SELECT COUNT(*) as reservasHoy
        FROM reserva r
        JOIN turno t ON r.turno_id = t.id
-       WHERE t.fecha = ?`,
-      [hoy]
+       WHERE t.fecha = ? AND r.estado = "confirmada"`,
+      [hoy],
     );
 
-            const [[{ turnosLibresHoy }]] = await pool.query(
-            `SELECT COUNT(*) as turnosLibresHoy
+    const [[{ turnosLibresHoy }]] = await pool.query(
+      `SELECT COUNT(*) as turnosLibresHoy
             FROM turno t
             JOIN cancha c ON t.cancha_id = c.id
             WHERE t.fecha = ? 
                 AND t.estado = 'disponible'
                 AND c.activa = 1`,
-            [hoy]
-            );
+      [hoy],
+    );
 
     const [[{ ingresosMes }]] = await pool.query(
       `SELECT COALESCE(SUM(c.precio), 0) as ingresosMes
@@ -33,7 +33,7 @@ export const getStatsModel = async () => {
        JOIN cancha c ON t.cancha_id = c.id
        WHERE MONTH(t.fecha) = MONTH(CURDATE())
          AND YEAR(t.fecha) = YEAR(CURDATE())
-         AND r.estado = 'confirmada'`
+         AND r.estado = 'confirmada'`,
     );
 
     return { totalUsuarios, reservasHoy, turnosLibresHoy, ingresosMes };
@@ -42,10 +42,8 @@ export const getStatsModel = async () => {
   }
 };
 
-
 export const getUsersModel = async () => {
   try {
-
     const [rows] = await pool.query(
       `SELECT
           u.id,
@@ -57,7 +55,7 @@ export const getUsersModel = async () => {
           u.estado,
           r.tipo AS rol
       FROM usuario u
-      JOIN rol r ON u.id_rol = r.id`
+      JOIN rol r ON u.id_rol = r.id`,
     );
 
     return rows;
@@ -66,11 +64,8 @@ export const getUsersModel = async () => {
   }
 };
 
-
 export const getReservasHoyModel = async () => {
   try {
-    
- 
     const [rows] = await pool.query(
       `SELECT 
         r.id,
@@ -84,7 +79,7 @@ export const getReservasHoyModel = async () => {
       JOIN turno t ON t.id = r.turno_id
       JOIN usuario u ON u.id = r.usuario_id
       JOIN cancha c ON c.id = t.cancha_id
-      WHERE t.fecha = CURDATE()`
+      WHERE t.fecha = CURDATE()`,
     );
     return rows;
   } catch (error) {
@@ -110,14 +105,13 @@ export const getHistorialModel = async () => {
         JOIN turno t ON t.id = r.turno_id
         JOIN usuario u ON u.id = r.usuario_id
         JOIN cancha c ON c.id = t.cancha_id
-        ORDER BY t.fecha DESC`
+        ORDER BY t.fecha DESC`,
     );
     return rows;
   } catch (error) {
     throw error;
   }
 };
-
 
 export const getIngresosModel = async (mes, anio) => {
   const [resumen] = await pool.query(
@@ -131,7 +125,7 @@ export const getIngresosModel = async (mes, anio) => {
     WHERE r.estado = 'confirmada'
       AND MONTH(t.fecha) = ?
       AND YEAR(t.fecha) = ?`,
-    [mes, anio]
+    [mes, anio],
   );
 
   const [porCancha] = await pool.query(
@@ -146,7 +140,7 @@ export const getIngresosModel = async (mes, anio) => {
       AND MONTH(t.fecha) = ?
       AND YEAR(t.fecha) = ?
     GROUP BY c.id, c.nombre`,
-    [mes, anio]
+    [mes, anio],
   );
 
   return { ...resumen[0], porCancha };

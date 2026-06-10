@@ -82,7 +82,7 @@ export const userLoginModel = async (email, contrasena) => {
     if (!isValidPassword) {
       return {
         success: false,
-        message: "Credenciales inválidas",
+        message: "Contraseña incorrecta",
       };
     }
 

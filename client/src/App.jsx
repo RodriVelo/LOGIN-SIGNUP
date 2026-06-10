@@ -1,6 +1,8 @@
 import "./App.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";        // 👈
+import "react-toastify/dist/ReactToastify.css";          // 👈
 
 import Home from "./pages/home/home";
 import Header from "./componentes/header";
@@ -21,6 +23,17 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+      <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          toastStyle={{
+            background: "rgba(255,255,255,0.05)",
+            backdropFilter: "blur(12px)",
+            border: "1px solid rgba(255,255,255,0.1)",
+            color: "#e2e8f0",
+            borderRadius: "12px",
+          }}
+        />
         <Header />
 
         <Routes>

@@ -54,13 +54,9 @@ export const userLogin = async (req, res) => {
 
     // 👇 ACÁ va la validación
     if (!result.success) {
-
-      if (result.message.includes("Google")) {
-        return res.status(403).json(result);
+        const status = result.message.includes("Google") ? 403 : 401;
+        return res.status(status).json({ message: result.message });
       }
-
-      return res.status(401).json(result);
-    }
 
     // recién si todo está OK seguís acá
     const token = generateToken({

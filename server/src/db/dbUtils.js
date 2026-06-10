@@ -119,12 +119,12 @@ CREATE TABLE IF NOT EXISTS reserva (
         FOREIGN KEY (turno_id)
         REFERENCES turno(id)
         ON DELETE CASCADE
-        ON UPDATE CASCADE,
-
-    UNIQUE (turno_id)
+        ON UPDATE CASCADE
 
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 `;
+
+
 const insertDefaultRoles = async () => {
   try {
 
