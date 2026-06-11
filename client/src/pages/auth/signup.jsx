@@ -15,63 +15,74 @@ const SignUp = () => {
     nro_documento: "",
     telefono: "",
     contrasena: "",
+    confirmar_contrasena: "", // ← agregar
   });
 
   const [formErrors, setFormErrors] = useState({});
 
   const validateForm = () => {
-  const errors = {};
+    const errors = {};
 
-  // Nombre
-  if (!formValues.nombre?.trim()) {
-    errors.nombre = "El nombre es obligatorio";
-  } else if (formValues.nombre.trim().length < 2) {
-    errors.nombre = "El nombre debe tener al menos 2 caracteres";
-  } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/.test(formValues.nombre.trim())) {
-    errors.nombre = "El nombre solo puede contener letras";
-  }
+    // Nombre
+    if (!formValues.nombre?.trim()) {
+      errors.nombre = "El nombre es obligatorio";
+    } else if (formValues.nombre.trim().length < 2) {
+      errors.nombre = "El nombre debe tener al menos 2 caracteres";
+    } else if (
+      !/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/.test(formValues.nombre.trim())
+    ) {
+      errors.nombre = "El nombre solo puede contener letras";
+    }
 
-  // Apellido
-  if (!formValues.apellido?.trim()) {
-    errors.apellido = "El apellido es obligatorio";
-  } else if (formValues.apellido.trim().length < 2) {
-    errors.apellido = "El apellido debe tener al menos 2 caracteres";
-  } else if (!/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/.test(formValues.apellido.trim())) {
-    errors.apellido = "El apellido solo puede contener letras";
-  }
+    // Apellido
+    if (!formValues.apellido?.trim()) {
+      errors.apellido = "El apellido es obligatorio";
+    } else if (formValues.apellido.trim().length < 2) {
+      errors.apellido = "El apellido debe tener al menos 2 caracteres";
+    } else if (
+      !/^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ\s'-]+$/.test(formValues.apellido.trim())
+    ) {
+      errors.apellido = "El apellido solo puede contener letras";
+    }
 
-  // Email
-  if (!formValues.email?.trim()) {
-    errors.email = "El email es obligatorio";
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email.trim())) {
-    errors.email = "Ingrese un email válido";
-  }
+    // Email
+    if (!formValues.email?.trim()) {
+      errors.email = "El email es obligatorio";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formValues.email.trim())) {
+      errors.email = "Ingrese un email válido";
+    }
 
-  // DNI
-  if (!formValues.nro_documento?.trim()) {
-    errors.nro_documento = "El DNI es obligatorio";
-  } else if (!/^\d{7,8}$/.test(formValues.nro_documento.trim())) {
-    errors.nro_documento = "El DNI debe tener 7 u 8 dígitos";
-  }
+    // DNI
+    if (!formValues.nro_documento?.trim()) {
+      errors.nro_documento = "El DNI es obligatorio";
+    } else if (!/^\d{7,8}$/.test(formValues.nro_documento.trim())) {
+      errors.nro_documento = "El DNI debe tener 7 u 8 dígitos";
+    }
 
-  // Teléfono
-  if (!formValues.telefono?.trim()) {
-    errors.telefono = "El teléfono es obligatorio";
-  } else if (!/^\+?[\d\s\-()]{8,15}$/.test(formValues.telefono.trim())) {
-    errors.telefono = "Ingrese un teléfono válido";
-  }
+    // Teléfono
+    if (!formValues.telefono?.trim()) {
+      errors.telefono = "El teléfono es obligatorio";
+    } else if (!/^\+?[\d\s\-()]{8,15}$/.test(formValues.telefono.trim())) {
+      errors.telefono = "Ingrese un teléfono válido";
+    }
 
-  // Contraseña
-  if (!formValues.contrasena) {
-    errors.contrasena = "Ingrese una contraseña";
-  } else if (formValues.contrasena.length < 8) {
-    errors.contrasena = "Mínimo 8 caracteres";
-  } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formValues.contrasena)) {
-    errors.contrasena = "Debe incluir mayúsculas, minúsculas y números";
-  }
+    // Contraseña
+    if (!formValues.contrasena) {
+      errors.contrasena = "Ingrese una contraseña";
+    } else if (formValues.contrasena.length < 8) {
+      errors.contrasena = "Mínimo 8 caracteres";
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formValues.contrasena)) {
+      errors.contrasena = "Debe incluir mayúsculas, minúsculas y números";
+    }
+    // Al final, antes del return errors
+    if (!formValues.confirmar_contrasena) {
+      errors.confirmar_contrasena = "Confirme su contraseña";
+    } else if (formValues.contrasena !== formValues.confirmar_contrasena) {
+      errors.confirmar_contrasena = "Las contraseñas no coinciden";
+    }
 
-  return errors;
-};
+    return errors;
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -99,11 +110,11 @@ const SignUp = () => {
     }
 
     try {
+      const { confirmar_contrasena, ...dataToSend } = formValues;
       const { data } = await axios.post(
         `${API}/auth/user-register`,
-        formValues,
+        dataToSend,
       );
-
       if (data.success) {
         toast.success("Usuario registrado correctamente");
 
@@ -114,6 +125,7 @@ const SignUp = () => {
           nro_documento: "",
           telefono: "",
           contrasena: "",
+          confirmar_contrasena: "",
         });
 
         navigate("/login");
@@ -159,33 +171,33 @@ const SignUp = () => {
                     placeholder:text-gray-400 outline-none transition-all
                     bg-white/10
                      ${
-                        formErrors.nombre
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.nombre
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
               />
 
-               {formErrors.nombre && (
-              <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v2m0 4h.01M12 3L2 21h20L12 3z"
-                  />
-                </svg>
+              {formErrors.nombre && (
+                <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01M12 3L2 21h20L12 3z"
+                    />
+                  </svg>
 
-                <span>{formErrors.nombre}</span>
-              </div>
-            )}
+                  <span>{formErrors.nombre}</span>
+                </div>
+              )}
             </div>
 
             <div className="flex flex-col">
@@ -202,33 +214,33 @@ const SignUp = () => {
     placeholder:text-gray-400 outline-none transition-all
     bg-white/10
                      ${
-                        formErrors.apellido
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.apellido
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
               />
 
-               {formErrors.apellido && (
-              <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-4 w-4 flex-shrink-0"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v2m0 4h.01M12 3L2 21h20L12 3z"
-                  />
-                </svg>
+              {formErrors.apellido && (
+                <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4 flex-shrink-0"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 9v2m0 4h.01M12 3L2 21h20L12 3z"
+                    />
+                  </svg>
 
-                <span>{formErrors.apellido}</span>
-              </div>
-            )}
+                  <span>{formErrors.apellido}</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -247,14 +259,14 @@ const SignUp = () => {
     placeholder:text-gray-400 outline-none transition-all
     bg-white/10
                      ${
-                        formErrors.nro_documento
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.nro_documento
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
-              />
+            />
 
-               {formErrors.nro_documento && (
+            {formErrors.nro_documento && (
               <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -291,14 +303,14 @@ const SignUp = () => {
     placeholder:text-gray-400 outline-none transition-all
     bg-white/10
                      ${
-                        formErrors.email
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.email
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
-              />
+            />
 
-               {formErrors.email && (
+            {formErrors.email && (
               <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -335,14 +347,14 @@ const SignUp = () => {
     placeholder:text-gray-400 outline-none transition-all
     bg-white/10
                      ${
-                        formErrors.telefono
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.telefono
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
-              />
+            />
 
-               {formErrors.telefono && (
+            {formErrors.telefono && (
               <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -379,14 +391,14 @@ const SignUp = () => {
     placeholder:text-gray-400 outline-none transition-all
     bg-white/10
                      ${
-                        formErrors.contrasena
-                          ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
-                          : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
-                      }
+                       formErrors.contrasena
+                         ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                         : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+                     }
                   `}
-              />
+            />
 
-               {formErrors.contrasena && (
+            {formErrors.contrasena && (
               <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -404,6 +416,47 @@ const SignUp = () => {
                 </svg>
 
                 <span>{formErrors.contrasena}</span>
+              </div>
+            )}
+          </div>
+          <div className="flex flex-col">
+            <label className="mb-2 font-medium text-gray-200">
+              Confirma su contraseña
+            </label>
+            <input
+              type="password"
+              name="confirmar_contrasena"
+              placeholder="Repita su contraseña"
+              value={formValues.confirmar_contrasena}
+              onChange={handleInputChange}
+              className={`
+              w-full rounded-xl px-4 py-3 text-white
+              placeholder:text-gray-400 outline-none transition-all
+              bg-white/10
+              ${
+                formErrors.confirmar_contrasena
+                  ? "border border-red-500 bg-red-500/5 focus:ring-red-500/30"
+                  : "border border-white/10 focus:border-red-400 focus:ring-2 focus:ring-red-500/30"
+              }
+            `}
+            />
+            {formErrors.confirmar_contrasena && (
+              <div className="mt-2 flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-sm text-red-300 animate-in fade-in slide-in-from-top-1 duration-200">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4 flex-shrink-0"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M12 9v2m0 4h.01M12 3L2 21h20L12 3z"
+                  />
+                </svg>
+                <span>{formErrors.confirmar_contrasena}</span>
               </div>
             )}
           </div>
