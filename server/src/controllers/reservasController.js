@@ -15,6 +15,10 @@ export const iniciarPago = async (req, res) => {
     console.log('2. Reserva creada con id:', reservaId);
 
     const preference = new Preference(mp);
+    const notifUrl = `${process.env.API_URL}/reservas/webhook`;
+console.log('notification_url exacta:', JSON.stringify(notifUrl));
+console.log('longitud:', notifUrl.length);
+console.log('char codes inicio:', [...notifUrl.slice(0,5)].map(c => c.charCodeAt(0)));
     const response = await preference.create({
       body: {
         items: [{

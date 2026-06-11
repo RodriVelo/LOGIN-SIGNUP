@@ -456,20 +456,20 @@ const SignUp = () => {
           <a
             href={`${API}/auth/google`}
             className="
-          flex w-full items-center justify-center gap-3
-          rounded-xl
-          border border-white/10
-          bg-white
-          px-5 py-3
-          font-medium
-          text-gray-700
-          shadow-lg
-          transition-all
-          duration-200
-          hover:-translate-y-1
-          hover:shadow-xl
-          active:scale-95
-        "
+                flex w-full items-center justify-center gap-3
+                rounded-xl
+                border border-white/10
+                bg-white
+                px-5 py-3
+                font-medium
+                text-gray-700
+                shadow-lg
+                transition-all
+                duration-200
+                hover:-translate-y-1
+                hover:shadow-xl
+                active:scale-95
+              "
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
