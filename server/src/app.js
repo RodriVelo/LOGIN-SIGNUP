@@ -14,6 +14,7 @@ import panelAdminRoutes from "./routes/panelAdminRoutes.js"
 
 const app = express();
 app.use(passport.initialize());
+console.log('CLIENT_URL:', JSON.stringify(process.env.CLIENT_URL));
 app.use(cors({
                 origin: process.env.CLIENT_URL,
                 credentials: true,
