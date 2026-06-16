@@ -1,23 +1,26 @@
-import { Users, Calendar, Clock, CircleDollarSign } from "lucide-react";
+import { Calendar, Clock, CircleDollarSign } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import NavegadorModalUsuario from "../../componentes/panelAdmin/navegadorModalUsuario";
+
 import NavegadorModalHistorial from "../../componentes/panelAdmin/navegadorModalHistorial";
 import NavegadorModalIngresos from "../../componentes/panelAdmin/navegadorModalIngresos";
 import NavegadorModalReservas from "../../componentes/panelAdmin/navegadorModalReservas";
+import NavegadorModalPendientes from "../../componentes/panelAdmin/navegadorModalPendientes";
+import NavegadorModalCanchas from "../../componentes/panelAdmin/navegadorModalCanchas";
 
 const API = import.meta.env.VITE_API_URL;
 axios.defaults.withCredentials = true;
 
 const TABS = [
-  { key: "usuarios", label: "Usuarios" },
-  { key: "reservas", label: "Reservas del día" },
-  { key: "historial", label: "Historial" },
-  { key: "ingresos", label: "Ingresos" },
+  { key: "reservas",   label: "Reservas del día" },
+  { key: "historial",  label: "Historial" },
+  { key: "ingresos",   label: "Ingresos" },
+  { key: "canchas",    label: "Canchas" },
+  { key: "pendientes", label: "Pendientes de pago" },
 ];
 
 export default function PanelAdmin() {
-  const [tabActiva, setTabActiva] = useState("usuarios");
+  const [tabActiva, setTabActiva] = useState("reservas");
   const [stats, setStats] = useState({
     totalUsuarios: null,
     reservasHoy: null,
@@ -43,10 +46,9 @@ export default function PanelAdmin() {
       : "—";
 
   const statCards = [
-    { icon: Users, label: "Usuarios", value: stats.totalUsuarios ?? "—", sub: "Registrados en el sistema" },
-    { icon: Calendar, label: "Reservas hoy", value: stats.reservasHoy ?? "—", sub: "Reservas del día actual" },
-    { icon: Clock, label: "Turnos libres", value: stats.turnosLibresHoy ?? "—", sub: "Disponibles para hoy" },
-    { icon: CircleDollarSign, label: "Ingresos del mes", value: formatPrecio(stats.ingresosMes), sub: "Reservas confirmadas" },
+    { icon: Calendar,         label: "Reservas hoy",    value: stats.reservasHoy     ?? "—", sub: "Reservas del día actual" },
+    { icon: Clock,            label: "Turnos libres",   value: stats.turnosLibresHoy ?? "—", sub: "Disponibles para hoy" },
+    { icon: CircleDollarSign, label: "Ingresos del mes",value: formatPrecio(stats.ingresosMes), sub: "Reservas confirmadas" },
   ];
 
   return (
@@ -70,7 +72,7 @@ export default function PanelAdmin() {
 
       <main className="max-w-5xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
           {statCards.map(({ icon: Icon, label, value, sub }) => (
             <div key={label} className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
               <div className="flex items-center gap-1.5 text-zinc-500 mb-2">
@@ -102,10 +104,11 @@ export default function PanelAdmin() {
 
         {/* Contenido */}
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-          {tabActiva === "usuarios"  && <NavegadorModalUsuario />}
-          {tabActiva === "reservas"  && <NavegadorModalReservas />}
-          {tabActiva === "historial" && <NavegadorModalHistorial />}
-          {tabActiva === "ingresos"  && <NavegadorModalIngresos />}
+          {tabActiva === "reservas"   && <NavegadorModalReservas />}
+          {tabActiva === "historial"  && <NavegadorModalHistorial />}
+          {tabActiva === "ingresos"   && <NavegadorModalIngresos />}
+          {tabActiva === "canchas"    && <NavegadorModalCanchas />}
+          {tabActiva === "pendientes" && <NavegadorModalPendientes />}
         </div>
       </main>
     </div>

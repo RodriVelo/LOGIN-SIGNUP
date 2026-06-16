@@ -1,4 +1,4 @@
-import { getStatsModel , getUsersModel , getReservasHoyModel, getHistorialModel , getIngresosModel} from "../models/panelAdminModels.js";
+import { getStatsModel , getUsersModel , getReservasHoyModel, getHistorialModel , getIngresosModel, getOcupacionCanchasModel, getReservasPendientesModel} from "../models/panelAdminModels.js";
 
 export const getStats = async (req, res) => {
   try {
@@ -78,3 +78,22 @@ export const getIngresos = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al solicitar ingresos" });
   }
 };
+
+
+export const getReservasPendientes = async (req, res) => {
+  try {
+    const pendientes = await getReservasPendientesModel()
+    res.json({ success: true, pendientes })
+  } catch (error) {
+    res.status(500).json({ success: false })
+  }
+}
+
+export const getOcupacionCanchas = async (req, res) => {
+  try {
+    const canchas = await getOcupacionCanchasModel()
+    res.json({ success: true, canchas })
+  } catch (error) {
+    res.status(500).json({ success: false })
+  }
+}

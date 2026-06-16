@@ -145,3 +145,39 @@ export const getIngresosModel = async (mes, anio) => {
 
   return { ...resumen[0], porCancha };
 };
+
+
+// getReservasPendientes - en tu panelAdmin model
+export const getReservasPendientesModel = async () => {
+  const [rows] = await pool.query(
+    `SELECT r.id, r.estado, r.created_at, r.expires_at,
+            u.nombre, u.apellido, u.telefono,
+            t.fecha, t.horario_inicio,
+            c.nombre as cancha_nombre, c.precio
+     FROM reserva r
+     JOIN usuario u ON r.usuario_id = u.id
+     JOIN turno t ON r.turno_id = t.id
+     JOIN cancha c ON t.cancha_id = c.id
+     WHERE r.estado = 'pendiente'
+     ORDER BY r.created_at DESC`
+  )
+  return rows
+}
+
+// getOcupacionCanchas - en tu panelAdmin model
+export const getOcupacionCanchasModel = async () => {
+  const hoy = new Date().toISOString().split("T")[0]
+  const [rows] = await pool.query(
+    `SELECT c.id, c.nombre, c.activa,
+        SUM(CASE WHEN t.id IS NOT NULL THEN 1 ELSE 0 END) as totalTurnos,
+        SUM(CASE WHEN t.estado = 'disponible' THEN 1 ELSE 0 END) as libres,
+        SUM(CASE WHEN t.estado = 'reservado'  THEN 1 ELSE 0 END) as reservados,
+        SUM(CASE WHEN t.estado = 'bloqueado'  THEN 1 ELSE 0 END) as bloqueados
+ FROM cancha c
+ LEFT JOIN turno t ON t.cancha_id = c.id AND t.fecha = ?
+ GROUP BY c.id, c.nombre, c.activa
+ ORDER BY c.nombre`,
+    [hoy]
+  )
+  return rows
+}
