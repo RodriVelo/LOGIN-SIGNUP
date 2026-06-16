@@ -231,7 +231,7 @@ export function ModalReserva({ turno, cancha, onCancelar, onClose, cancelando, p
 // PanelEditarCancha
 // ─────────────────────────────────────────────
 
-export function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
+export function PanelEditarCancha({ cancha, onClose, onGuardar, guardando, borrarCancha }) {
   const [form, setForm] = useState({
     nombre: cancha?.nombre ?? "",
     tipo:   cancha?.tipo   ?? "",
@@ -311,6 +311,12 @@ export function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
               />
             </button>
           </div>
+           <button
+              onClick={() => borrarCancha(cancha)}
+              className="w-full py-2.5 rounded-xl border border-red-500/20 bg-red-500/10 text-red-400 hover:bg-red-500/20 text-sm font-semibold transition-all duration-150"
+            >
+              Eliminar cancha
+          </button>
         </div>
 
         {/* Footer */}
@@ -345,6 +351,137 @@ export function PanelEditarCancha({ cancha, onClose, onGuardar, guardando }) {
 }
 
 // ─────────────────────────────────────────────
+// ModalCanchaNueva 
+// ────
+export function ModalCanchaNueva({ onClose, onGuardar, guardando }) {
+  const [form, setForm] = useState({
+    nombre: "",
+    tipo: "",
+    precio: "",
+    activa: true,
+  });
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({ ...prev, [name]: type === "checkbox" ? checked : value }));
+  };
+
+  return (
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Panel */}
+      <div className="fixed top-0 right-0 z-50 h-full w-full max-w-sm bg-zinc-900 border-l border-zinc-700 shadow-2xl flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-5 border-b border-zinc-800">
+          <div>
+            <h2 className="text-base font-bold text-white">Nueva cancha</h2>
+            <p className="text-xs text-zinc-500 mt-0.5">Completá los datos para agregar una cancha</p>
+          </div>
+          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-300 transition-colors">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Campos */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-5">
+          {/* Nombre */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Nombre</label>
+            <input
+              name="nombre"
+              value={form.nombre}
+              onChange={handleChange}
+              placeholder="Ej: Cancha 1"
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-zinc-500 transition-colors placeholder:text-zinc-600"
+            />
+          </div>
+
+          {/* Tipo */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Tipo</label>
+            <select
+              name="tipo"
+              value={form.tipo}
+              onChange={handleChange}
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-zinc-500 transition-colors"
+            >
+              <option value="" disabled>Seleccioná un tipo</option>
+              <option value="futbol5">Fútbol 5</option>
+              <option value="futbol7">Fútbol 7</option>
+              <option value="futbol11">Fútbol 11</option>
+            </select>
+          </div>
+
+          {/* Precio */}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-xs text-zinc-400 font-semibold uppercase tracking-wider">Precio por hora (ARS)</label>
+            <input
+              name="precio"
+              type="number"
+              value={form.precio}
+              onChange={handleChange}
+              placeholder="Ej: 15000"
+              className="bg-zinc-800 border border-zinc-700 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-zinc-500 transition-colors placeholder:text-zinc-600"
+            />
+          </div>
+
+          {/* Activa */}
+          <div className="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3">
+            <div>
+              <p className="text-sm text-white font-medium">Cancha activa</p>
+              <p className="text-xs text-zinc-500 mt-0.5">Si está desactivada no aparece para los clientes</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setForm((prev) => ({ ...prev, activa: !prev.activa }))}
+              className={`relative w-11 h-6 rounded-full border transition-all duration-200 shrink-0 ${
+                form.activa ? "bg-emerald-500 border-emerald-500" : "bg-zinc-700 border-zinc-600"
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all duration-200 ${
+                  form.activa ? "left-5" : "left-0.5"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-5 border-t border-zinc-800 flex gap-3">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-zinc-700 text-zinc-400 hover:text-zinc-200 hover:border-zinc-500 text-sm font-semibold transition-all duration-150"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={() => onGuardar(form)}
+            disabled={guardando || !form.nombre || !form.precio || !form.tipo}
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all duration-150 active:scale-95 ${
+              guardando || !form.nombre || !form.precio || !form.tipo
+                ? "bg-zinc-700 text-zinc-500 cursor-not-allowed"
+                : "bg-red-500 hover:bg-red-400 text-white shadow-lg shadow-red-500/20"
+            }`}
+          >
+            {guardando ? (
+              <span className="flex items-center justify-center gap-2">
+                <Spinner size="sm" color="zinc" /> Guardando...
+              </span>
+            ) : (
+              "Crear cancha"
+            )}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+}
+// ─────────────────────────────────────────────
 // CanchasAdmin (principal)
 // ─────────────────────────────────────────────
 
@@ -366,8 +503,11 @@ export default function CanchasAdmin({
   const [cancelando,        setCancelando]        = useState(false);
   const [bloqueando,        setBloqueando]        = useState(null);
   const [panelCancha,       setPanelCancha]       = useState(null);
+  const [modalCanchaNueva, setModalCanchaNueva] = useState(null)
   const [guardando,         setGuardando]         = useState(false);
   const [confirmacion,      setConfirmacion]      = useState(null);
+ 
+
 
   const hoyDate    = new Date();
   const hoy        = hoyDate.toISOString().split("T")[0];
@@ -416,6 +556,21 @@ export default function CanchasAdmin({
     }
   };
 
+
+  const handleBorrarCancha = async (cancha) => {
+    pedirConfirmacion(`¿Querés eliminar la cancha "${cancha.nombre}"? Esta acción no se puede deshacer.`, async () => {
+      try {
+        await axios.delete(`${API}/canchas/borrarCancha/${cancha.id}`);
+        setCanchas((prev) => prev.filter((c) => c.id !== cancha.id));
+        setCanchaAbierta(canchas.find((c) => c.id !== cancha.id)?.id ?? null);
+        setPanelCancha(null);
+        toast.success("La cancha ha sido eliminada");
+      } catch (err) {
+        const mensaje = err.response?.data?.error ?? "No se pudo eliminar la cancha.";
+        toast.error(mensaje); // acá te va a llegar el msj del backend si tiene reservas activas
+      }
+    });
+  };
   // ── Bloquear / desbloquear turno ─────────────
 
   const handleBloquear = async (turno) => {
@@ -463,8 +618,29 @@ export default function CanchasAdmin({
     }
   };
 
-  // ── Render ────────────────────────────────────
+ const heandleGuardarCanchaNueva = async (form) => {
+  setGuardando(true);
+  try {
+    const  response  = await axios.post(`${API}/canchas/crearCancha`, {
+      ...form,
+      activa: form.activa ? 1 : 0,
+    });
 
+    
+    setCanchas((prev) => [...prev, response.data.cancha]); // ajustá según lo que devuelve tu API
+    setModalCanchaNueva(null);
+    toast.success("La cancha ha sido creada");
+  } catch (error) {
+    console.error(error);
+    setError("No se pudo guardar la cancha.");
+    setTimeout(() => setError(null), 4000);
+    toast.error("Error al crear la cancha");
+  } finally {
+    setGuardando(false);
+  }
+};
+
+  // ── Render ────────────────────────────────────
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
 
@@ -484,6 +660,15 @@ export default function CanchasAdmin({
           cancha={panelCancha}
           onClose={() => setPanelCancha(null)}
           onGuardar={handleGuardarCancha}
+          guardando={guardando}
+          borrarCancha={handleBorrarCancha}
+        />
+      )}
+
+        {modalCanchaNueva && (
+        <ModalCanchaNueva
+          onClose={() => setModalCanchaNueva(null)}
+          onGuardar={heandleGuardarCanchaNueva}
           guardando={guardando}
         />
       )}
@@ -516,6 +701,8 @@ export default function CanchasAdmin({
                 canchas={canchas}
                 canchaAbierta={canchaAbierta}
                 setCanchaAbierta={setCanchaAbierta}
+                esAdmin={true}
+                setModalCanchaNueva={setModalCanchaNueva}
               />
               {/* {canchas.map((cancha) => (
                 <button

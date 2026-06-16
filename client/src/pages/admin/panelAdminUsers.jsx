@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from "react";
 import {
   Users,
   Search,
-  UserPlus,
   Pencil,
   Trash2,
   UserCheck,
@@ -16,10 +15,131 @@ import axios from "axios";
 import ModalConfirmacion from "../../componentes/modalConfirmacion";
 import { toast } from "react-toastify";
 
-
 const API = import.meta.env.VITE_API_URL;
 const TAMANIO_PAGINA = 10;
 
+// ── Panel Editar Usuario ───────────────────────────────────────
+export function PanelEditarUsuario({ usuario, onCerrar, onGuardar }) {
+  const [form, setForm] = useState({
+    nombre: usuario.nombre ?? "",
+    apellido: usuario.apellido ?? "",
+    email: usuario.email ?? "",
+    telefono: usuario.telefono ?? "",
+    rol: usuario.rol ?? "cliente",
+    nro_documento: usuario.nro_documento ?? "",
+  });
+  const [guardando, setGuardando] = useState(false);
+
+  const handleChange = (e) => {
+    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+  };
+
+  const handleGuardar = async () => {
+    setGuardando(true);
+    try {
+      const res = await axios.patch(
+        `${API}/panelAdmin/users/${usuario.id}/editar`,
+        form
+      );
+      if (res.data.success) {
+        toast.success("Usuario actualizado");
+        onGuardar({ ...usuario, ...form });
+        onCerrar();
+      }
+    } catch (error) {
+      console.error("Error al editar usuario:", error);
+      toast.error("No se pudo actualizar el usuario");
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+      onClick={onCerrar}
+    >
+      <div
+        className="w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl space-y-5"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-zinc-800">
+              <Pencil size={13} className="text-zinc-400" />
+            </div>
+            <h2 className="text-sm font-semibold text-zinc-100">
+              Editar usuario
+            </h2>
+          </div>
+          <button
+            onClick={onCerrar}
+            className="text-zinc-500 hover:text-zinc-300 transition-colors text-xs"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Campos */}
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "Nombre", name: "nombre" },
+            { label: "Apellido", name: "apellido" },
+            { label: "Email", name: "email" },
+            { label: "Teléfono", name: "telefono" },
+            { label: "Nro. Documento", name: "nro_documento" },
+          ].map(({ label, name }) => (
+            <div key={name} className={name === "email" ? "col-span-2" : ""}>
+              <label className="block text-[11px] text-zinc-500 mb-1">
+                {label}
+              </label>
+              <input
+                name={name}
+                value={form[name]}
+                onChange={handleChange}
+                className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-zinc-500 transition-colors"
+              />
+            </div>
+          ))}
+
+          {/* Rol */}
+          <div>
+            <label className="block text-[11px] text-zinc-500 mb-1">Rol</label>
+            <select
+              name="rol"
+              value={form.rol}
+              onChange={handleChange}
+              className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 transition-colors cursor-pointer"
+            >
+              <option value="cliente">Cliente</option>
+              <option value="admin">Administrador</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Botones */}
+        <div className="flex justify-end gap-2 pt-1">
+          <button
+            onClick={onCerrar}
+            className="rounded-lg border border-zinc-700 px-4 py-1.5 text-xs text-zinc-400 hover:bg-zinc-800 transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleGuardar}
+            disabled={guardando}
+            className="rounded-lg bg-zinc-100 px-4 py-1.5 text-xs font-medium text-zinc-900 hover:bg-white disabled:opacity-50 transition-colors"
+          >
+            {guardando ? "Guardando…" : "Guardar cambios"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Panel Admin Users ──────────────────────────────────────────
 export default function PanelAdminUsers() {
   const [usuarios, setUsuarios] = useState([]);
   const [cargando, setCargando] = useState(true);
@@ -27,8 +147,9 @@ export default function PanelAdminUsers() {
   const [filtroEstado, setFiltroEstado] = useState("");
   const [filtroRol, setFiltroRol] = useState("");
   const [paginaActual, setPaginaActual] = useState(1);
-
   const [confirmacion, setConfirmacion] = useState(null);
+  const [modalEditar, setModalEditar] = useState(false);
+  const [usuarioEditar, setUsuarioEditar] = useState(null);
 
   const pedirConfirmacion = (mensaje, accion) => {
     setConfirmacion({ mensaje, accion });
@@ -37,6 +158,22 @@ export default function PanelAdminUsers() {
   const handleConfirmar = () => {
     confirmacion.accion();
     setConfirmacion(null);
+  };
+
+  const abrirEditar = (usuario) => {
+    setUsuarioEditar(usuario);
+    setModalEditar(true);
+  };
+
+  const cerrarEditar = () => {
+    setModalEditar(false);
+    setUsuarioEditar(null);
+  };
+
+  const handleGuardarEdicion = (usuarioActualizado) => {
+    setUsuarios((prev) =>
+      prev.map((u) => (u.id === usuarioActualizado.id ? usuarioActualizado : u))
+    );
   };
 
   // ── Carga inicial ──────────────────────────────────────────────
@@ -59,19 +196,17 @@ export default function PanelAdminUsers() {
     try {
       const res = await axios.patch(
         `${API}/panelAdmin/users/${id}/cambiarEstado`,
-        {
-          estado: nuevoEstado,
-        },
+        { estado: nuevoEstado }
       );
       if (res.data.success) {
         setUsuarios((prev) =>
-          prev.map((u) => (u.id === id ? { ...u, estado: nuevoEstado } : u)),
+          prev.map((u) => (u.id === id ? { ...u, estado: nuevoEstado } : u))
         );
-        toast.success("Estado modificado")
+        toast.success("Estado modificado");
       }
     } catch (error) {
       console.error("Error al cambiar estado:", error);
-      toast.error("Estado no modificado")
+      toast.error("Estado no modificado");
     }
   };
 
@@ -92,11 +227,11 @@ export default function PanelAdminUsers() {
 
   const totalPaginas = Math.max(
     1,
-    Math.ceil(usuariosFiltrados.length / TAMANIO_PAGINA),
+    Math.ceil(usuariosFiltrados.length / TAMANIO_PAGINA)
   );
   const usuariosPagina = usuariosFiltrados.slice(
     (paginaActual - 1) * TAMANIO_PAGINA,
-    paginaActual * TAMANIO_PAGINA,
+    paginaActual * TAMANIO_PAGINA
   );
 
   const cambiarFiltro = (setter) => (e) => {
@@ -136,7 +271,7 @@ export default function PanelAdminUsers() {
         accent: "text-red-400",
       },
     ],
-    [usuarios],
+    [usuarios]
   );
 
   // ── Render ─────────────────────────────────────────────────────
@@ -173,7 +308,9 @@ export default function PanelAdminUsers() {
               </div>
               <div>
                 <p
-                  className={`text-2xl font-semibold leading-none ${cargando ? "animate-pulse text-zinc-700" : accent}`}
+                  className={`text-2xl font-semibold leading-none ${
+                    cargando ? "animate-pulse text-zinc-700" : accent
+                  }`}
                 >
                   {cargando ? "—" : value}
                 </p>
@@ -247,7 +384,9 @@ export default function PanelAdminUsers() {
                   ].map((h, i) => (
                     <th
                       key={h}
-                      className={`px-4 py-3 text-[11px] font-medium uppercase tracking-wider text-zinc-500 ${i === 7 ? "text-right" : "text-left"}`}
+                      className={`px-4 py-3 text-[11px] font-medium uppercase tracking-wider text-zinc-500 ${
+                        i === 7 ? "text-right" : "text-left"
+                      }`}
                     >
                       {h}
                     </th>
@@ -298,8 +437,8 @@ export default function PanelAdminUsers() {
                             u.estado === "activo"
                               ? "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20"
                               : u.estado === "suspendido"
-                                ? "bg-red-500/10 text-red-400 ring-red-500/20"
-                                : "bg-zinc-500/10 text-zinc-400 ring-zinc-500/20"
+                              ? "bg-red-500/10 text-red-400 ring-red-500/20"
+                              : "bg-zinc-500/10 text-zinc-400 ring-zinc-500/20"
                           }`}
                         >
                           {u.estado}
@@ -316,32 +455,20 @@ export default function PanelAdminUsers() {
                             <button
                               title="Editar"
                               className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-blue-500/10 transition-colors text-zinc-400 hover:text-blue-400"
+                              onClick={() => abrirEditar(u)}
                             >
                               <Pencil size={12} />
                             </button>
                           )}
 
                           {/* Suspender / Activar */}
-                          {u.estado === "suspendido" ? (
+                          {u.estado === "suspendido" || u.estado === "inactivo" ? (
                             <button
                               title="Activar"
                               onClick={() =>
                                 pedirConfirmacion(
                                   "¿Querés activar a este usuario?",
-                                  () => cambiarEstadoUsuario(u.id, "activo"),
-                                )
-                              }
-                              className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-emerald-500/10 transition-colors text-zinc-400 hover:text-emerald-400"
-                            >
-                              <UserCheck size={12} />
-                            </button>
-                          ) : u.estado === "inactivo" ? (
-                            <button
-                              title="Activar"
-                              onClick={() =>
-                                pedirConfirmacion(
-                                  "¿Querés activar a este usuario?",
-                                  () => cambiarEstadoUsuario(u.id, "activo"),
+                                  () => cambiarEstadoUsuario(u.id, "activo")
                                 )
                               }
                               className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-emerald-500/10 transition-colors text-zinc-400 hover:text-emerald-400"
@@ -354,8 +481,7 @@ export default function PanelAdminUsers() {
                               onClick={() =>
                                 pedirConfirmacion(
                                   "¿Querés suspender este usuario?",
-                                  () =>
-                                    cambiarEstadoUsuario(u.id, "suspendido"),
+                                  () => cambiarEstadoUsuario(u.id, "suspendido")
                                 )
                               }
                               className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-amber-500/10 transition-colors text-zinc-400 hover:text-amber-400"
@@ -364,14 +490,14 @@ export default function PanelAdminUsers() {
                             </button>
                           )}
 
-                          {/* Eliminar - solo si no está inactivo */}
+                          {/* Desactivar */}
                           {u.estado !== "inactivo" && (
                             <button
                               title="Desactivar"
                               onClick={() =>
                                 pedirConfirmacion(
                                   "¿Querés desactivar este usuario?",
-                                  () => cambiarEstadoUsuario(u.id, "inactivo"),
+                                  () => cambiarEstadoUsuario(u.id, "inactivo")
                                 )
                               }
                               className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-red-500/10 transition-colors text-zinc-400 hover:text-red-400"
@@ -395,7 +521,7 @@ export default function PanelAdminUsers() {
                 {(paginaActual - 1) * TAMANIO_PAGINA + 1}–
                 {Math.min(
                   paginaActual * TAMANIO_PAGINA,
-                  usuariosFiltrados.length,
+                  usuariosFiltrados.length
                 )}{" "}
                 de {usuariosFiltrados.length}
               </span>
@@ -413,7 +539,7 @@ export default function PanelAdminUsers() {
                     (p) =>
                       p === 1 ||
                       p === totalPaginas ||
-                      Math.abs(p - paginaActual) <= 1,
+                      Math.abs(p - paginaActual) <= 1
                   )
                   .reduce((acc, p, idx, arr) => {
                     if (idx > 0 && p - arr[idx - 1] > 1) acc.push("...");
@@ -440,7 +566,7 @@ export default function PanelAdminUsers() {
                       >
                         {p}
                       </button>
-                    ),
+                    )
                   )}
 
                 <button
@@ -456,6 +582,17 @@ export default function PanelAdminUsers() {
             </div>
           )}
         </div>
+
+        {/* Modal Editar */}
+        {modalEditar && usuarioEditar && (
+          <PanelEditarUsuario
+            usuario={usuarioEditar}
+            onCerrar={cerrarEditar}
+            onGuardar={handleGuardarEdicion}
+          />
+        )}
+
+        {/* Modal Confirmación */}
         {confirmacion && (
           <ModalConfirmacion
             mensaje={confirmacion.mensaje}

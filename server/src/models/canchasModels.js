@@ -15,8 +15,7 @@ export const getCanchasModel = async () => {
 
 export const editarCanchaModel = async (id, canchaData) => {
   try {
-    console.log(canchaData)
-    console.log(id)
+
     await pool.query(
       `
       UPDATE cancha
@@ -30,6 +29,39 @@ export const editarCanchaModel = async (id, canchaData) => {
         id
       ]
     );
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const crearCanchaModel = async (canchaNueva) => {
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO cancha (nombre, tipo, precio, activa) VALUES (?, ?, ?, ?)',
+      [canchaNueva.nombre, canchaNueva.tipo, canchaNueva.precio, canchaNueva.activa]
+    );
+
+    const [rows] = await pool.query('SELECT * FROM cancha WHERE id = ?', [result.insertId]);
+    return rows[0];
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const borrarCanchaModel = async (cancha_id) => {
+  try {
+    const [reservas] = await pool.query(`
+      SELECT COUNT(*) as total 
+      FROM reserva r
+      JOIN turno t ON r.turno_id = t.id
+      WHERE t.cancha_id = ? AND r.estado IN ('pendiente', 'confirmada')
+    `, [cancha_id]);
+
+    if (reservas[0].total > 0) {
+      throw new Error('La cancha tiene reservas activas');
+    }
+
+    await pool.query(`DELETE FROM cancha WHERE id = ?`, [cancha_id]);
   } catch (error) {
     throw error;
   }

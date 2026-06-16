@@ -1,5 +1,5 @@
 
-import { getCanchasModel, editarCanchaModel } from "../models/canchasModels.js";
+import { getCanchasModel, editarCanchaModel, crearCanchaModel, borrarCanchaModel} from "../models/canchasModels.js";
 
 export const getCanchas = async (req, res) => {
   try {
@@ -36,6 +36,41 @@ export const editarCancha = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Error al editar la cancha",
+    });
+  }
+};
+
+export const crearCancha= async (req,res) =>{
+  const canchaNueva = req.body;
+  try {
+    const cancha = await crearCanchaModel(canchaNueva);
+    res.json({
+      success:true,
+      message:"Cancha creada",
+      cancha
+    })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({
+      success:false,
+      message:"Error al crear la cancha"
+    })
+  }
+}
+
+export const borrarCancha = async (req, res) => {
+  const idCancha = req.params.cancha_id;
+  try {
+    await borrarCanchaModel(idCancha);
+    res.json({
+      success: true,
+      message: "Cancha eliminada",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(400).json({
+      success: false,
+      error: error.message,
     });
   }
 };
