@@ -49,3 +49,33 @@ export const bloquearTurnoModel = async (turno_id, nuevoEstado) =>{
   }
 }
 
+
+
+export const generarTurnosParaCancha = async (canchaId) => {
+  try {
+    for (let dia = 0; dia < 14; dia++) {
+      const fecha = new Date()
+      fecha.setUTCHours(0, 0, 0, 0)
+      fecha.setUTCDate(fecha.getUTCDate() + dia)
+      const fechaFormateada = fecha.toISOString().split("T")[0]
+
+      for (let hora = 10; hora < 23; hora++) {
+        const horario_inicio = `${String(hora).padStart(2, "0")}:00:00`
+        const horario_fin = `${String(hora + 1).padStart(2, "0")}:00:00`
+
+        try {
+          await pool.query(
+            `INSERT INTO turno (cancha_id, fecha, horario_inicio, horario_fin, estado)
+             VALUES (?, ?, ?, ?, 'disponible')`,
+            [canchaId, fechaFormateada, horario_inicio, horario_fin]
+          )
+        } catch (error) {
+          if (error.code !== "ER_DUP_ENTRY") throw error
+        }
+      }
+    }
+    console.log(`✅ Turnos generados para cancha ${canchaId}`)
+  } catch (error) {
+    console.log("❌ Error generando turnos para cancha:", error.message)
+  }
+}

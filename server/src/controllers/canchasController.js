@@ -1,5 +1,6 @@
 
 import { getCanchasModel, editarCanchaModel, crearCanchaModel, borrarCanchaModel} from "../models/canchasModels.js";
+import {generarTurnosParaCancha} from "../models/turnosModels.js"
 
 export const getCanchas = async (req, res) => {
   try {
@@ -42,8 +43,10 @@ export const editarCancha = async (req, res) => {
 
 export const crearCancha= async (req,res) =>{
   const canchaNueva = req.body;
+
   try {
     const cancha = await crearCanchaModel(canchaNueva);
+    await generarTurnosParaCancha(cancha.id);
     res.json({
       success:true,
       message:"Cancha creada",

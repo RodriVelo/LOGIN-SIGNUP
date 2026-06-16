@@ -82,7 +82,7 @@ const ejecutarReserva = async (turno) => {
     });
 
     if (response.data.success) {
-      console.log(response.data);
+   
       // Redirigir a Mercado Pago
       window.location.href = response.data.init_point;
     }

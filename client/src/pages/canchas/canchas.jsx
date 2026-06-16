@@ -57,7 +57,7 @@ useEffect(() => {
         });
         if (response.data.success) {
           setTurnos(response.data.turnos);
-          console.log("turnos", response.data.turnos)
+          
         }
       } catch (error) {
         console.log(error);
