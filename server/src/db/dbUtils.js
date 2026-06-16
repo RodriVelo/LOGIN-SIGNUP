@@ -213,11 +213,11 @@ const generarTurnos = async () => {
           const horario_fin = `${String(hora + 1).padStart(2, "0")}:00:00`;
 
           try {
-            await pool.query(
-              `INSERT INTO turno (cancha_id, fecha, horario_inicio, horario_fin)
-               VALUES (?, ?, ?, ?)`,
-              [cancha.id, fechaFormateada, horario_inicio, horario_fin]
-            );
+           await pool.query(
+                  `INSERT INTO turno (cancha_id, fecha, horario_inicio, horario_fin, estado)
+                  VALUES (?, ?, ?, ?, 'disponible')`,
+                  [cancha.id, fechaFormateada, horario_inicio, horario_fin]
+                );
           } catch (error) {
             if (error.code !== "ER_DUP_ENTRY") throw error;
           }
