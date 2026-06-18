@@ -95,8 +95,13 @@ export const userLogin = async (req, res) => {
   }
 };
 export const googleCallback = async (req, res) => {
-
   try {
+
+    // ← verificar estado antes de generar token
+    if (req.user.estado !== 'activo') {
+      return res.redirect(`${process.env.CLIENT_URL}/login?error=suspendido`);
+    }
+
     const token = jwt.sign(
       {
         id: req.user.id,
@@ -116,7 +121,6 @@ export const googleCallback = async (req, res) => {
       maxAge: 24 * 60 * 60 * 1000,
     });
 
-    // Si no tiene teléfono, redirigir al perfil para completarlo
     if (!req.user.telefono) {
       return res.redirect(`${process.env.CLIENT_URL}/perfil`);
     }

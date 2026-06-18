@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../utils/authContext";
@@ -9,6 +9,15 @@ const API = import.meta.env.VITE_API_URL;
 const Login = () => {
   const navigate = useNavigate();
   const { login } = useAuth();
+
+
+  // ← agregás esto
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "suspendido") {
+      toast.warning("Tu cuenta está suspendida. Contactá al administrador.");
+    }
+  }, []);
 
   const [formValues, setFormValues] = useState({
     email: "",

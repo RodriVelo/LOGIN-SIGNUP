@@ -8,12 +8,20 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify"; 
 
 export default function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
+
+  // agregás esto
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("error") === "suspendido") {
+    toast.warning("Tu cuenta está suspendida. Contactá al administrador.");
+  }
   }, []);
 
   const cards = [
