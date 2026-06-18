@@ -1,4 +1,4 @@
-import { getStatsModel , getUsersModel , getReservasHoyModel, getHistorialModel , getIngresosModel, getOcupacionCanchasModel, getReservasPendientesModel} from "../models/panelAdminModels.js";
+import { getStatsModel , getUsersModel , getReservasHoyModel, getHistorialModel , getIngresosModel, getOcupacionCanchasModel, getReservasPendientesModel, eliminarUsuarioModel} from "../models/panelAdminModels.js";
 
 export const getStats = async (req, res) => {
   try {
@@ -95,6 +95,23 @@ export const getOcupacionCanchas = async (req, res) => {
     res.json({ success: true, canchas })
   } catch (error) {
     res.status(500).json({ success: false })
+  }
+}
+
+export const eliminarUsuario = async (req,res)=>{
+  const id_user = req.params.id
+  try {
+    await eliminarUsuarioModel(id_user);
+    res.json({
+      success:true,
+      message:"Usuario eliminado"
+    })
+  } catch (error) {
+    res.status(500).json({
+      success:false,
+      message:"Error al elminar el usuario"
+    })
+    
   }
 }
 

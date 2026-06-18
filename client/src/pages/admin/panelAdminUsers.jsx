@@ -210,6 +210,18 @@ export default function PanelAdminUsers() {
     }
   };
 
+  const eliminarUsuario = async (id) => {
+  try {
+    const res = await axios.delete(`${API}/panelAdmin/users/${id}/eliminarUsuario`);
+    if (res.data.success) {
+      setUsuarios((prev) => prev.filter((u) => u.id !== id));
+      toast.success("Usuario eliminado");
+    }
+  } catch (error) {
+    console.error("Error al eliminar usuario:", error);
+    toast.error("No se pudo eliminar el usuario");
+  }
+};
   // ── Filtrado y paginación ──────────────────────────────────────
   const usuariosFiltrados = useMemo(() => {
     const q = busqueda.toLowerCase();
@@ -451,15 +463,7 @@ export default function PanelAdminUsers() {
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-1">
                           {/* Editar */}
-                          {u.estado !== "inactivo" && (
-                            <button
-                              title="Editar"
-                              className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-blue-500/10 transition-colors text-zinc-400 hover:text-blue-400"
-                              onClick={() => abrirEditar(u)}
-                            >
-                              <Pencil size={12} />
-                            </button>
-                          )}
+                        
 
                           {/* Suspender / Activar */}
                           {u.estado === "suspendido" || u.estado === "inactivo" ? (
@@ -476,6 +480,7 @@ export default function PanelAdminUsers() {
                               <UserCheck size={12} />
                             </button>
                           ) : (
+                            <>
                             <button
                               title="Suspender"
                               onClick={() =>
@@ -487,24 +492,33 @@ export default function PanelAdminUsers() {
                               className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-amber-500/10 transition-colors text-zinc-400 hover:text-amber-400"
                             >
                               <UserMinus size={12} />
+                            </button> 
+                            <button
+                              title="Editar"
+                              className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-blue-500/10 transition-colors text-zinc-400 hover:text-blue-400"
+                              onClick={() => abrirEditar(u)}
+                            >
+                              <Pencil size={12} />
                             </button>
+                            </>
                           )}
 
                           {/* Desactivar */}
-                          {u.estado !== "inactivo" && (
-                            <button
-                              title="Desactivar"
-                              onClick={() =>
-                                pedirConfirmacion(
-                                  "¿Querés desactivar este usuario?",
-                                  () => cambiarEstadoUsuario(u.id, "inactivo")
-                                )
-                              }
-                              className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-red-500/10 transition-colors text-zinc-400 hover:text-red-400"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          )}
+                        {/* Eliminar — solo si está suspendido */}
+                              {u.estado === "suspendido" && (
+                                <button
+                                  title="Eliminar"
+                                  onClick={() =>
+                                    pedirConfirmacion(
+                                      "¿Querés eliminar este usuario? Esta acción no se puede deshacer.",
+                                      () => eliminarUsuario(u.id)
+                                    )
+                                  }
+                                  className="flex h-6 w-6 items-center justify-center rounded-md hover:bg-red-500/10 transition-colors text-zinc-400 hover:text-red-400"
+                                >
+                                  <Trash2 size={12} />
+                                </button>
+                              )}
                         </div>
                       </td>
                     </tr>

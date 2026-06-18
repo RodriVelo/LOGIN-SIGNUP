@@ -58,7 +58,13 @@ export const userLogin = async (req, res) => {
         return res.status(status).json({ message: result.message });
       }
 
-    // recién si todo está OK seguís acá
+      if (result.user.estado !== 'activo') {
+        return res.status(403).json({ 
+          success: false, 
+          message: "Tu cuenta está suspendida. Contactá al administrador." 
+        });
+      }
+          // recién si todo está OK seguís acá
     const token = generateToken({
       id: result.user.id,
       nombre: result.user.nombre,

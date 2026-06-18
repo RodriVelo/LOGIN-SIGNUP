@@ -44,22 +44,21 @@ export const userRegisterModel = async (user) => {
 export const userLoginModel = async (email, contrasena) => {
   try {
     const [rows] = await pool.query(
-      `
-           SELECT 
-              usuario.id,
-              usuario.nombre,
-              usuario.apellido,
-              usuario.email,
-              usuario.contrasena,
-              usuario.telefono,
-              usuario.google_id,
-              rol.tipo AS rol
-            FROM usuario
-            JOIN rol ON usuario.id_rol = rol.id
-            WHERE usuario.email = ?
-            `,
-      [email],
-    );
+          `SELECT 
+            usuario.id,
+            usuario.nombre,
+            usuario.apellido,
+            usuario.email,
+            usuario.contrasena,
+            usuario.telefono,
+            usuario.google_id,
+            usuario.estado,
+            rol.tipo AS rol
+          FROM usuario
+          JOIN rol ON usuario.id_rol = rol.id
+          WHERE usuario.email = ?`,
+          [email]
+        );
 
     if (rows.length === 0) {
       return {

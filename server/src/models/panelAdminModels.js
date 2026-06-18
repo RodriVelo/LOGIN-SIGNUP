@@ -181,3 +181,15 @@ export const getOcupacionCanchasModel = async () => {
   )
   return rows
 }
+
+export const eliminarUsuarioModel = async (id) => {
+  try {
+    const [result] = await pool.query(
+      `DELETE FROM usuario WHERE id = ?`,
+      [id]
+    );
+    return { success: true };
+  } catch (error) {
+    throw error;
+  }
+};
