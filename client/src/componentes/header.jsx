@@ -171,7 +171,11 @@ export default function Header() {
               </DropdownItem>
   
   
-
+            {user && (
+              <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
+                Perfil
+              </DropdownItem>
+            )}
             {user?.rol === "admin" && (
               <>
                 <DropdownItem icon={<Shield size={16} />} onClick={() => go("/admin")}>
@@ -183,8 +187,8 @@ export default function Header() {
               </>
             )}
             {user && (
-              <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
-                Perfil
+              <DropdownItem icon={<List size={16} />} onClick={() => go("/misreservas")}>
+                Reservas
               </DropdownItem>
             )}
             {/* Auth */}

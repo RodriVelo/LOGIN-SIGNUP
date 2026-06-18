@@ -13,5 +13,4 @@ router.post(`/webhook`, webhook)
 
 // ------ RUTAS ADMIN -------
 router.patch("/cancelarReserva/:reserva_id", authenticateToken, cancelarReserva);
-
 export default router;

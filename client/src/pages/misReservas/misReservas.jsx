@@ -50,7 +50,6 @@ function formatFecha(fechaStr) {
 function formatHora(hora) {
   return hora?.slice(0, 5);
 }
-
 export default function MisReservas() {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -97,6 +96,8 @@ export default function MisReservas() {
       setCancelando(null);
     }
   };
+
+  
 
   const activas = reservas.filter((r) => r.estado !== "cancelada");
   const canceladas = reservas.filter((r) => r.estado === "cancelada");

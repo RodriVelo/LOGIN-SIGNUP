@@ -1,8 +1,8 @@
 import "./App.css";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { ToastContainer } from "react-toastify";        // 👈
-import "react-toastify/dist/ReactToastify.css";          // 👈
+import { ToastContainer } from "react-toastify"; // 👈
+import "react-toastify/dist/ReactToastify.css"; // 👈
 
 import Home from "./pages/home/home";
 import Header from "./componentes/header";
@@ -25,7 +25,7 @@ function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
-      <ToastContainer
+        <ToastContainer
           position="top-right"
           autoClose={3000}
           toastStyle={{
@@ -53,7 +53,7 @@ function App() {
               </ProtectedRoute>
             }
           />
-         <Route
+          <Route
             path="/admin"
             element={
               <ProtectedRoute rolPermitido="admin">
@@ -69,20 +69,13 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/canchas" element={<Canchas />} />
           <Route
-            path="/canchas"
-            element={
-             
-                <Canchas />
-              
-            }
-          />
-           <Route
             path="/misreservas"
             element={
-             <ProtectedRoute>
+              <ProtectedRoute>
                 <MisReservas />
-             </ProtectedRoute>
+              </ProtectedRoute>
             }
           />
         </Routes>
