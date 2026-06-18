@@ -105,9 +105,10 @@ if (loading) {
 }
 
   // No autenticado
-  if (!isAuthenticated) {
-    return <Navigate to="/" replace state={{ from: location }} />;
-  }
+ // ProtectedRoute.jsx — línea 79 aprox
+if (!isAuthenticated) {
+  return <Navigate to="/login" replace state={{ from: location }} />;
+}
 
   // Autenticado
   return children;

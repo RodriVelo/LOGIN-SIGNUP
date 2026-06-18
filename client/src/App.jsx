@@ -17,6 +17,8 @@ import Perfil from "./pages/user/perfil";
 import PanelAdmin from "./pages/admin/panelAdmin";
 import PanelAdminUsers from "./pages/admin/panelAdminUsers";
 import Canchas from "./pages/canchas/canchas";
+import MisReservas from "./pages/misReservas/misReservas";
+
 import { AuthProvider } from "./utils/authContext";
 
 function App() {
@@ -58,7 +60,7 @@ function App() {
                 <PanelAdmin />
               </ProtectedRoute>
             }
-/>
+          />
           <Route
             path="/users"
             element={
@@ -73,6 +75,14 @@ function App() {
              
                 <Canchas />
               
+            }
+          />
+           <Route
+            path="/misreservas"
+            element={
+             <ProtectedRoute>
+                <MisReservas />
+             </ProtectedRoute>
             }
           />
         </Routes>

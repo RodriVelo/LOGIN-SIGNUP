@@ -25,7 +25,7 @@ export function PanelEditarUsuario({ usuario, onCerrar, onGuardar }) {
     apellido: usuario.apellido ?? "",
     email: usuario.email ?? "",
     telefono: usuario.telefono ?? "",
-    rol: usuario.rol ?? "cliente",
+    rol: usuario.rol ?? "2",
     nro_documento: usuario.nro_documento ?? "",
   });
   const [guardando, setGuardando] = useState(false);
@@ -38,7 +38,7 @@ export function PanelEditarUsuario({ usuario, onCerrar, onGuardar }) {
     setGuardando(true);
     try {
       const res = await axios.patch(
-        `${API}/panelAdmin/users/${usuario.id}/editar`,
+        `${API}/panelAdmin/users/${usuario.id}/editarPerfil`,
         form
       );
       if (res.data.success) {
@@ -112,9 +112,9 @@ export function PanelEditarUsuario({ usuario, onCerrar, onGuardar }) {
               onChange={handleChange}
               className="w-full bg-zinc-800/60 border border-zinc-700/60 rounded-lg px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-zinc-500 transition-colors cursor-pointer"
             >
-              <option value="cliente">Cliente</option>
-              <option value="admin">Administrador</option>
-            </select>
+              <option value="2">Cliente</option>
+              <option value="1">Administrador</option>
+            </select>setModalEditar
           </div>
         </div>
 

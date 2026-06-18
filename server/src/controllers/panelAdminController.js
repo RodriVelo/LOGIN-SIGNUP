@@ -97,3 +97,4 @@ export const getOcupacionCanchas = async (req, res) => {
     res.status(500).json({ success: false })
   }
 }
+

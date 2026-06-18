@@ -12,6 +12,7 @@ import {
   Zap,
   Menu,
   X,
+  List ,
 } from "lucide-react";
 import { useAuth } from "../utils/authContext";
 
@@ -51,6 +52,7 @@ export default function Header() {
     setMenuOpen(false);
   };
 
+ 
   return (
     <header className="bg-[#0a0a0a] text-white border-b border-white/[0.06] px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between relative">
       
@@ -73,9 +75,14 @@ export default function Header() {
         <NavButton onClick={() => go("/canchas")}>
           <Home size={14} /> Canchas
         </NavButton>
-        {user?.rol === "cliente" && (
+        {user && (
           <NavButton onClick={() => go("/perfil")}>
             <User size={14} /> Perfil
+          </NavButton>
+        )}
+        {user?.rol === "cliente" && (
+          <NavButton onClick={() => go("/misreservas")}>
+            <List  size={14} /> Reservas
           </NavButton>
         )}
         {user?.rol === "admin" && (
@@ -158,10 +165,6 @@ export default function Header() {
               Home
             </DropdownItem>
 
-          
-              <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
-                Perfil
-              </DropdownItem>
 
               <DropdownItem icon={<User size={16} />} onClick={() => go("/canchas")}>
                 Canchas
@@ -179,7 +182,11 @@ export default function Header() {
                 </DropdownItem>
               </>
             )}
-
+            {user && (
+              <DropdownItem icon={<User size={16} />} onClick={() => go("/perfil")}>
+                Perfil
+              </DropdownItem>
+            )}
             {/* Auth */}
             <div className="border-t border-white/[0.06] mt-1 pt-1">
               {!user ? (

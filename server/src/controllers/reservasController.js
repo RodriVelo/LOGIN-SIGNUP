@@ -1,6 +1,7 @@
 import {realizarReservaModel, cancelarReservaModel} from "../models/reservasModels.js"
 import { MercadoPagoConfig, Preference, Payment } from 'mercadopago';
 import { iniciarReservaModel, confirmarReservaModel } from '../models/reservasModels.js';
+
 // import detenv from "dotenv"
 // detenv.config()
 
@@ -94,3 +95,12 @@ export const cancelarReserva = async (req, res) => {
       message: "Error al cancelar reserva" });
   }
 };
+
+export const misReservas = async (req,res) =>{
+  console.log(req.user)
+  try {
+    
+  } catch (error) {
+    
+  }
+}
