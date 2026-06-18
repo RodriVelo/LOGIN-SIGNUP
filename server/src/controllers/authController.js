@@ -96,7 +96,6 @@ export const userLogin = async (req, res) => {
 };
 export const googleCallback = async (req, res) => {
   try {
-
     // ← verificar estado antes de generar token
     if (req.user.estado !== 'activo') {
       return res.redirect(`${process.env.CLIENT_URL}/login?error=suspendido`);

@@ -32,6 +32,7 @@ passport.use(
             usuario.apellido,
             usuario.email,
             usuario.telefono,
+            usuario.estado,
             rol.tipo AS rol
           FROM usuario
           JOIN rol ON usuario.id_rol = rol.id
