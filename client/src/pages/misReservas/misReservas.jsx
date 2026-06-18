@@ -39,11 +39,12 @@ const TIPO_LABEL = {
 };
 
 function formatFecha(fechaStr) {
-  const fecha = new Date(fechaStr + "T00:00:00");
+  const fecha = new Date(fechaStr);
   return fecha.toLocaleDateString("es-AR", {
     weekday: "long",
     day: "numeric",
     month: "long",
+    timeZone: "America/Argentina/Buenos_Aires",
   });
 }
 
@@ -66,6 +67,7 @@ export default function MisReservas() {
       const res = await axios.get(`${API}/reservas/misreservas`, {
         withCredentials: true,
       });
+      
       if (res.data.success) setReservas(res.data.reservas);
     } catch (err) {
       console.error(err);
@@ -98,7 +100,7 @@ export default function MisReservas() {
   };
 
   
-
+  
   const activas = reservas.filter((r) => r.estado !== "cancelada");
   const canceladas = reservas.filter((r) => r.estado === "cancelada");
 
@@ -239,7 +241,7 @@ function ReservaCard({ reserva, onCancelar, cancelando }) {
       </div>
 
       {/* Botón cancelar */}
-      {!cancelada && (
+      {/* {!cancelada && (
         <button
           onClick={() => onCancelar(reserva.id)}
           disabled={cancelando === reserva.id}
@@ -247,7 +249,7 @@ function ReservaCard({ reserva, onCancelar, cancelando }) {
         >
           {cancelando === reserva.id ? "Cancelando..." : "Cancelar reserva"}
         </button>
-      )}
+      )} */}
     </div>
   );
 }

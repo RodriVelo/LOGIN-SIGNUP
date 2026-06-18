@@ -1,24 +1,25 @@
-
-import { getCanchasModel, editarCanchaModel, crearCanchaModel, borrarCanchaModel} from "../models/canchasModels.js";
-import {generarTurnosParaCancha} from "../models/turnosModels.js"
+import {
+  getCanchasModel,
+  editarCanchaModel,
+  crearCanchaModel,
+  borrarCanchaModel,
+} from "../models/canchasModels.js";
+import { generarTurnosParaCancha } from "../models/turnosModels.js";
 
 export const getCanchas = async (req, res) => {
   try {
-    
     const canchas = await getCanchasModel();
 
     res.json({
       success: true,
-      canchas
+      canchas,
     });
-
   } catch (error) {
-
     console.log(error);
 
     res.status(500).json({
       success: false,
-      message: "Error al obtener canchas"
+      message: "Error al obtener canchas",
     });
   }
 };
@@ -41,25 +42,25 @@ export const editarCancha = async (req, res) => {
   }
 };
 
-export const crearCancha= async (req,res) =>{
+export const crearCancha = async (req, res) => {
   const canchaNueva = req.body;
 
   try {
     const cancha = await crearCanchaModel(canchaNueva);
     await generarTurnosParaCancha(cancha.id);
     res.json({
-      success:true,
-      message:"Cancha creada",
-      cancha
-    })
+      success: true,
+      message: "Cancha creada",
+      cancha,
+    });
   } catch (error) {
-    console.log(error)
+    console.log(error);
     res.status(500).json({
-      success:false,
-      message:"Error al crear la cancha"
-    })
+      success: false,
+      message: "Error al crear la cancha",
+    });
   }
-}
+};
 
 export const borrarCancha = async (req, res) => {
   const idCancha = req.params.cancha_id;

@@ -89,3 +89,30 @@ export const cancelarReservaModel = async (id) => {
     conn.release();
   }
 };
+
+export const misReservasModel = async (user) => {
+  try {
+    const [reservas] = await pool.query(`
+      SELECT 
+        r.id,
+        r.estado,
+        r.created_at,
+        t.fecha,
+        t.horario_inicio,
+        t.horario_fin,
+        c.nombre AS cancha_nombre,
+        c.tipo   AS cancha_tipo,
+        c.precio
+      FROM reserva r
+      JOIN turno   t ON r.turno_id  = t.id
+      JOIN cancha  c ON t.cancha_id = c.id
+      WHERE r.usuario_id = ?
+      ORDER BY t.fecha ASC, t.horario_inicio ASC
+    `, [user.id]);
+
+    return reservas;
+  } catch (error) {
+    throw error;
+  }
+};
+
