@@ -81,7 +81,7 @@ export default function Home() {
             </button>
 
             <button
-              onClick={() => navigate("/perfil")}
+              onClick={() => navigate("/misreservas")}
               className="px-6 py-3 rounded-xl border border-slate-700 bg-[oklch(21%_0.006_285.885)] hover:border-red-500/40 transition-all duration-200"
             >
               Mis turnos
