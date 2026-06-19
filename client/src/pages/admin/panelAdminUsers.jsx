@@ -114,7 +114,7 @@ export function PanelEditarUsuario({ usuario, onCerrar, onGuardar }) {
             >
               <option value="2">Cliente</option>
               <option value="1">Administrador</option>
-            </select>setModalEditar
+            </select>
           </div>
         </div>
 
@@ -160,10 +160,13 @@ export default function PanelAdminUsers() {
     setConfirmacion(null);
   };
 
-  const abrirEditar = (usuario) => {
-    setUsuarioEditar(usuario);
-    setModalEditar(true);
-  };
+    const abrirEditar = (usuario) => {
+      setUsuarioEditar({
+        ...usuario,
+        rol: usuario.rol === "admin" ? "1" : "2",
+      });
+      setModalEditar(true);
+    };
 
   const cerrarEditar = () => {
     setModalEditar(false);
@@ -181,6 +184,7 @@ export default function PanelAdminUsers() {
     const obtenerUsuarios = async () => {
       try {
         const res = await axios.get(`${API}/panelAdmin/getUsers`);
+        console.log(res.data.users)
         if (res.data.success) setUsuarios(res.data.users);
       } catch (error) {
         console.error("Error al obtener usuarios:", error);

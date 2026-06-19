@@ -14,11 +14,13 @@ export default function Canchas() {
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingTurnos, setLoadingTurnos] = useState(false);
- const [fechaSeleccionada, setFechaSeleccionada] = useState(
-      () => new Date().toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" })
-          .split("/").reverse().join("-")
-      // "19/06/2026" → "2026-06-19"
-    );
+      const [fechaSeleccionada, setFechaSeleccionada] = useState(() => {
+        const hoy = new Date();
+        const año = hoy.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", year: "numeric" });
+        const mes = hoy.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", month: "2-digit" });
+        const dia = hoy.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires", day: "2-digit" });
+        return `${año}-${mes}-${dia}`;
+      });
   const [canchaAbierta, setCanchaAbierta] = useState(null);
 
   const [error, setError] = useState(null);
