@@ -22,7 +22,9 @@ export const formatPrecio = (precio) =>
 
 export const formatFecha = (fechaStr) => {
   if (!fechaStr) return "";
-  const [year, month, day] = fechaStr.split("-");
+  // Si viene como timestamp completo, extraé solo la fecha
+  const soloFecha = fechaStr.split("T")[0];
+  const [year, month, day] = soloFecha.split("-");
   return `${day}/${month}/${year}`;
 };
 

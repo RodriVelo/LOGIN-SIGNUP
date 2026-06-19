@@ -39,7 +39,7 @@ const TIPO_LABEL = {
 };
 
 function formatFecha(fechaStr) {
-  const fecha = new Date(fechaStr);
+  const fecha = new Date(fechaStr + "T00:00:00"); // 👈 esto fuerza hora local
   return fecha.toLocaleDateString("es-AR", {
     weekday: "long",
     day: "numeric",
