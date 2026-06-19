@@ -23,8 +23,8 @@ function BadgeEstado({ estado }) {
 
 const formatFecha = (fechaStr) => {
   if (!fechaStr) return "—";
-  const fecha = new Date(fechaStr);
-  return fecha.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
+  const [year, month, day] = fechaStr.split("-");
+  return `${day}/${month}/${year}`;
 };
 
 const formatPrecio = (v) =>

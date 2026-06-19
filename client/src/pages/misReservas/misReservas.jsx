@@ -39,15 +39,15 @@ const TIPO_LABEL = {
 };
 
 function formatFecha(fechaStr) {
-  const fecha = new Date(fechaStr + "T00:00:00"); // 👈 esto fuerza hora local
+  if (!fechaStr) return "—";
+  const [year, month, day] = fechaStr.split("-");
+  const fecha = new Date(year, month - 1, day); // mes es 0-indexed
   return fecha.toLocaleDateString("es-AR", {
     weekday: "long",
     day: "numeric",
     month: "long",
-    timeZone: "America/Argentina/Buenos_Aires",
   });
 }
-
 function formatHora(hora) {
   return hora?.slice(0, 5);
 }
