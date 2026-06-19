@@ -223,37 +223,32 @@ const ejecutarReserva = async (turno) => {
             {canchaActual && (
               <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
                 {/* ── Info de la cancha ── */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-4 sm:px-6 py-5 border-b border-zinc-800">
-                  <div>
-                    <h2 className="text-lg sm:text-xl font-bold text-white">
-                      {canchaActual.nombre}
-                    </h2>
-                    {canchaActual.tipo && (
-                      <span className="inline-block mt-1.5 text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 rounded-md px-2.5 py-0.5 uppercase tracking-wider">
-                        {canchaActual.tipo}
-                      </span>
-                    )}
-                  </div>
+                <div className="flex flex-col gap-4 px-4 sm:px-6 py-5 border-b border-zinc-800">
+  {/* Nombre + tipo */}
+  <div className="flex flex-col gap-1.5">
+    <h2 className="text-xl font-bold text-white">{canchaActual.nombre}</h2>
+    {canchaActual.tipo && (
+      <span className="text-xs text-zinc-400 bg-zinc-800 border border-zinc-700 rounded-md px-2.5 py-0.5 uppercase tracking-wider w-fit">
+        {canchaActual.tipo}
+      </span>
+    )}
+  </div>
 
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="text-right">
-                      <p className="text-xs text-zinc-500 uppercase tracking-wider mb-0.5">
-                        Por hora
-                      </p>
-                      <p className="text-xl sm:text-2xl font-bold text-red-400">
-                        {formatPrecio(canchaActual.precio)}
-                      </p>
-                    </div>
-                    <div className="bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2.5 text-center min-w-[72px]">
-                      <p className="text-2xl font-black text-blue-400 leading-none">
-                        {turnosLibres}
-                      </p>
-                      <p className="text-xs text-zinc-500 mt-1 whitespace-nowrap">
-                        turnos libres
-                      </p>
-                    </div>
-                  </div>
-                </div>
+  {/* Stats + precio */}
+  <div className="flex items-center gap-2.5">
+    <div className="flex-1 bg-zinc-800/60 border border-zinc-700 rounded-xl px-3 py-2.5 text-center">
+      <p className="text-xl font-black text-blue-400 leading-none">{turnosLibres}</p>
+      <p className="text-xs text-zinc-500 mt-1 whitespace-nowrap">Turnos libres</p>
+    </div>
+
+    <div className="w-px h-9 bg-zinc-700 shrink-0" />
+
+    <div className="flex flex-col gap-0.5 px-1">
+      <p className="text-xs text-zinc-500 uppercase tracking-wider">Por hora</p>
+      <p className="text-xl font-bold text-red-400">{formatPrecio(canchaActual.precio)}</p>
+    </div>
+  </div>
+</div>
 
                 {/* ── Grid de turnos ── */}
                 <div className="p-4 sm:p-6">

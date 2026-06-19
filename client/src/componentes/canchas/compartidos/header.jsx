@@ -36,14 +36,15 @@ export default function Header({
             />
           </svg>
 
-          <input
-            type="date"
-            min={hoy}
-            max={maxFechaStr}
-            value={fechaSeleccionada}
-            onChange={(e) => setFechaSeleccionada(e.target.value)}
-            className="bg-transparent text-sm text-zinc-100 outline-none cursor-pointer [color-scheme:dark]"
-          />
+        <input
+                type="date"
+                lang="es-AR"   // 👈 esto
+                min={hoy}
+                max={maxFechaStr}
+                value={fechaSeleccionada}
+                onChange={(e) => setFechaSeleccionada(e.target.value)}
+                className="bg-transparent text-sm text-zinc-100 outline-none cursor-pointer [color-scheme:dark]"
+              />
         </div>
       </div>
     </header>

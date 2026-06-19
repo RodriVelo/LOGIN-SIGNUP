@@ -51,6 +51,73 @@ function formatFecha(fechaStr) {
 function formatHora(hora) {
   return hora?.slice(0, 5);
 }
+
+function ReservaCard({ reserva, onCancelar, cancelando }) {
+  const estado = ESTADO_CONFIG[reserva.estado] || ESTADO_CONFIG.pendiente;
+  const EstadoIcon = estado.icon;
+  const cancelada = reserva.estado === "cancelada";
+
+  return (
+    <div
+      className={`rounded-3xl border bg-[oklch(21%_0.006_285.885)] p-6 transition-all duration-200 flex flex-col gap-5 ${
+        cancelada
+          ? "border-slate-800 opacity-50"
+          : "border-slate-800 hover:border-red-500/30"
+      }`}
+    >
+      {/* Top row */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="text-white font-bold text-lg leading-tight">
+            {reserva.cancha_nombre}
+          </p>
+          <p className="text-slate-500 text-sm mt-0.5">
+            {TIPO_LABEL[reserva.cancha_tipo] || reserva.cancha_tipo}
+          </p>
+        </div>
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium shrink-0 ${estado.class}`}
+        >
+          <EstadoIcon size={12} />
+          {estado.label}
+        </span>
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <CalendarDays size={14} className="text-red-400 shrink-0" />
+          <span className="capitalize">{formatFecha(reserva.fecha)}</span>
+        </div>
+        <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <Clock size={14} className="text-red-400 shrink-0" />
+          <span>
+            {formatHora(reserva.horario_inicio)} – {formatHora(reserva.horario_fin)} hs
+          </span>
+        </div>
+        <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <MapPin size={14} className="text-red-400 shrink-0" />
+          <span>${Number(reserva.precio).toLocaleString("es-AR")} por hora</span>
+        </div>
+      </div>
+
+      {/* Spacer para empujar botón al fondo */}
+      <div className="flex-1" />
+
+      {/* Botón cancelar */}
+      {/* {!cancelada && (
+        <button
+          onClick={() => onCancelar(reserva.id)}
+          disabled={cancelando === reserva.id}
+          className="w-full py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:border-red-500/40 hover:text-red-400 transition-all duration-200 text-sm font-semibold active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {cancelando === reserva.id ? "Cancelando..." : "Cancelar reserva"}
+        </button>
+      )} */}
+    </div>
+  );
+}
+
 export default function MisReservas() {
   const [reservas, setReservas] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -67,7 +134,6 @@ export default function MisReservas() {
       const res = await axios.get(`${API}/reservas/misreservas`, {
         withCredentials: true,
       });
-      
       if (res.data.success) setReservas(res.data.reservas);
     } catch (err) {
       console.error(err);
@@ -99,8 +165,6 @@ export default function MisReservas() {
     }
   };
 
-  
-  
   const activas = reservas.filter((r) => r.estado !== "cancelada");
   const canceladas = reservas.filter((r) => r.estado === "cancelada");
 
@@ -110,7 +174,7 @@ export default function MisReservas() {
       <div className="absolute top-0 left-0 w-72 h-72 bg-red-500/20 blur-3xl rounded-full" />
       <div className="absolute bottom-0 right-0 w-72 h-72 bg-red-500/10 blur-3xl rounded-full" />
 
-      <div className="relative z-10 max-w-2xl mx-auto px-6 py-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-6 py-16">
 
         {/* Header */}
         <div className="mb-10">
@@ -156,15 +220,20 @@ export default function MisReservas() {
 
         {/* Reservas activas */}
         {!loading && activas.length > 0 && (
-          <div className="flex flex-col gap-4 mb-10">
-            {activas.map((reserva) => (
-              <ReservaCard
-                key={reserva.id}
-                reserva={reserva}
-                onCancelar={handleCancelar}
-                cancelando={cancelando}
-              />
-            ))}
+          <div className="mb-10">
+            <p className="text-xs text-slate-600 uppercase tracking-widest mb-4">
+              Activas · {activas.length}
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {activas.map((reserva) => (
+                <ReservaCard
+                  key={reserva.id}
+                  reserva={reserva}
+                  onCancelar={handleCancelar}
+                  cancelando={cancelando}
+                />
+              ))}
+            </div>
           </div>
         )}
 
@@ -172,9 +241,9 @@ export default function MisReservas() {
         {!loading && canceladas.length > 0 && (
           <div>
             <p className="text-xs text-slate-600 uppercase tracking-widest mb-4">
-              Canceladas
+              Canceladas · {canceladas.length}
             </p>
-            <div className="flex flex-col gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {canceladas.map((reserva) => (
                 <ReservaCard
                   key={reserva.id}
@@ -187,69 +256,6 @@ export default function MisReservas() {
           </div>
         )}
       </div>
-    </div>
-  );
-}
-
-function ReservaCard({ reserva, onCancelar, cancelando }) {
-  const estado = ESTADO_CONFIG[reserva.estado] || ESTADO_CONFIG.pendiente;
-  const EstadoIcon = estado.icon;
-  const cancelada = reserva.estado === "cancelada";
-
-  return (
-    <div
-      className={`rounded-3xl border bg-[oklch(21%_0.006_285.885)] p-6 transition-all duration-200 ${
-        cancelada ? "border-slate-800 opacity-50" : "border-slate-800 hover:border-red-500/30"
-      }`}
-    >
-      {/* Top row */}
-      <div className="flex items-start justify-between gap-4 mb-5">
-        <div>
-          <p className="text-white font-bold text-lg leading-tight">
-            {reserva.cancha_nombre}
-          </p>
-          <p className="text-slate-500 text-sm mt-0.5">
-            {TIPO_LABEL[reserva.cancha_tipo] || reserva.cancha_tipo}
-          </p>
-        </div>
-
-        {/* Badge estado */}
-        <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-medium shrink-0 ${estado.class}`}
-        >
-          <EstadoIcon size={12} />
-          {estado.label}
-        </span>
-      </div>
-
-      {/* Info */}
-      <div className="flex flex-col gap-2 mb-5">
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
-          <CalendarDays size={14} className="text-red-400 shrink-0" />
-          <span className="capitalize">{formatFecha(reserva.fecha)}</span>
-        </div>
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
-          <Clock size={14} className="text-red-400 shrink-0" />
-          <span>
-            {formatHora(reserva.horario_inicio)} – {formatHora(reserva.horario_fin)} hs
-          </span>
-        </div>
-        <div className="flex items-center gap-2 text-slate-400 text-sm">
-          <MapPin size={14} className="text-red-400 shrink-0" />
-          <span>${Number(reserva.precio).toLocaleString("es-AR")} por hora</span>
-        </div>
-      </div>
-
-      {/* Botón cancelar */}
-      {/* {!cancelada && (
-        <button
-          onClick={() => onCancelar(reserva.id)}
-          disabled={cancelando === reserva.id}
-          className="w-full py-2.5 rounded-xl border border-slate-700 text-slate-400 hover:border-red-500/40 hover:text-red-400 transition-all duration-200 text-sm font-semibold active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {cancelando === reserva.id ? "Cancelando..." : "Cancelar reserva"}
-        </button>
-      )} */}
     </div>
   );
 }

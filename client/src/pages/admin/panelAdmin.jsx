@@ -13,9 +13,9 @@ axios.defaults.withCredentials = true;
 
 const TABS = [
   { key: "reservas",   label: "Reservas del día" },
-  { key: "historial",  label: "Historial" },
+  { key: "historial",  label: "Historial de reservas" },
   { key: "ingresos",   label: "Ingresos" },
-  { key: "canchas",    label: "Canchas" },
+  { key: "canchas",    label: "Ocupacion de canchas" },
   { key: "pendientes", label: "Pendientes de pago" },
 ];
 

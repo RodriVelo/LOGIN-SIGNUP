@@ -10,8 +10,8 @@ function Spinner() {
 
 const formatFecha = (fechaStr) => {
   if (!fechaStr) return "—";
-  const [year, month, day] = fechaStr.split("-");
-  return `${day}/${month}/${year}`;
+  const fecha = new Date(fechaStr);
+  return fecha.toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" });
 };
 
 const formatPrecio = (v) =>
