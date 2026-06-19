@@ -14,9 +14,11 @@ export default function Canchas() {
   const [turnos, setTurnos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingTurnos, setLoadingTurnos] = useState(false);
-  const [fechaSeleccionada, setFechaSeleccionada] = useState(
-    () => new Date().toISOString().split("T")[0],
-  );
+ const [fechaSeleccionada, setFechaSeleccionada] = useState(
+      () => new Date().toLocaleDateString("es-AR", { timeZone: "America/Argentina/Buenos_Aires" })
+          .split("/").reverse().join("-")
+      // "19/06/2026" → "2026-06-19"
+    );
   const [canchaAbierta, setCanchaAbierta] = useState(null);
 
   const [error, setError] = useState(null);
